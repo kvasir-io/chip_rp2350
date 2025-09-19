@@ -1,0 +1,3 @@
+[submodule "src/chip/rp_common"]
+	path = src/chip/rp_common
+	url = git@github.com:kvasir-io/chip_rp_common.git

@@ -1,6 +1,6 @@
 [submodule "src/chip/rp_common"]
-	path = src/chip/rp_common
-	url = git@github.com:kvasir-io/chip_rp_common.git
+    path = src/chip/rp_common
+	url = https://github.com/kvasir-io/chip_rp_common.git
 [submodule "core"]
 	path = core
-	url = git@github.com:kvasir-io/core_cortex_m33.git
+	url = https://github.com/kvasir-io/core_cortex_m33.git

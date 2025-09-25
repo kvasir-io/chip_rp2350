@@ -2,6 +2,5 @@ FROM kvasirio/kvasir:latest AS rp2350_dev
 
 ENV CHIP_ROOT=/opt/chip
 COPY . ${CHIP_ROOT}/
-WORKDIR ${CHIP_ROOT}
 RUN git config --global --add safe.directory ${CHIP_ROOT}
-ENTRYPOINT ${KVASIR_ROOT}/scripts/entrypoint.sh
+ENTRYPOINT ["/opt/kvasir/scripts/entrypoint.sh"]

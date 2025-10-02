@@ -18,8 +18,8 @@
 #include "peripherals/XOSC.hpp"
 
 ///
-//#include "CRC.hpp"
-//#include "DMA.hpp"
+#include "rp_common/CRC.hpp"
+#include "rp_common/DMA.hpp"
 //#include "I2C.hpp"
 #include "Interrupt.hpp"
 #include "rp_common/Io.hpp"
@@ -36,4 +36,3 @@
 //#include "rom_functions.hpp"
 #include "rp_common/usb.hpp"
 //#include "watchdog.hpp"
-

@@ -14,6 +14,19 @@ namespace Kvasir { namespace Startup {
     struct FirstInitStep<Tag::User, Ts...> {
         void operator()() {
             Core::startup();
+
+            using PPB = Kvasir::Peripheral::PPB::Registers<0>;
+
+            //enable FPU and RCP coprocessor
+            apply(PPB::CPACR::overrideDefaults(write(PPB::CPACR::cp11, Register::value<3>()),
+                                               write(PPB::CPACR::cp10, Register::value<3>()),
+                                               write(PPB::CPACR::cp7, Register::value<3>())),
+                  PPB::NSACR::overrideDefaults(write(PPB::NSACR::cp11, Register::value<1>()),
+                                               write(PPB::NSACR::cp10, Register::value<1>()),
+                                               write(PPB::NSACR::cp7, Register::value<1>())));
+
+            using Reset = Kvasir::Peripheral::RESETS::Registers<>::RESET;
+
             using Reset = Kvasir::Peripheral::RESETS::Registers<>::RESET;
             apply(set(Reset::usbctrl),
                   set(Reset::uart1),
@@ -107,3 +120,4 @@ namespace Kvasir { namespace Startup {
 }}   // namespace Kvasir::Startup
 
 #include "kvasir/StartUp/StartUp.hpp"
+

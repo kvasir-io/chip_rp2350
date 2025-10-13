@@ -6,6 +6,7 @@
 #include "peripherals/IO_QSPI.hpp"
 #include "peripherals/PIO.hpp"
 #include "peripherals/PLL.hpp"
+#include "peripherals/POWMAN.hpp"
 #include "peripherals/PSM.hpp"
 #include "peripherals/PWM.hpp"
 #include "peripherals/RESETS.hpp"
@@ -16,6 +17,7 @@
 #include "peripherals/WATCHDOG.hpp"
 //#include "peripherals/XIP_SSI.hpp"
 #include "peripherals/XOSC.hpp"
+#include "peripherals/PPB.hpp"
 
 ///
 #include "Interrupt.hpp"
@@ -25,12 +27,13 @@
 #include "rp_common/DMA.hpp"
 #include "rp_common/I2C.hpp"
 #include "rp_common/Io.hpp"
+#include "rp_common/PIO.hpp"
 #include "rp_common/SPI.hpp"
 #include "rp_common/UART.hpp"
 #include "rp_common/bootrom_functions.hpp"
+#include "rp_common/chip_reset.hpp"
 #include "rp_common/clock_config.hpp"
 #include "rp_common/usb.hpp"
+#include "rp_common/watchdog.hpp"
 //#include "flash.hpp"
 //#include "pwm.hpp"
-//#include "watchdog.hpp"
-

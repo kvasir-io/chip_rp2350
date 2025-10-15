@@ -120,4 +120,3 @@ namespace Kvasir { namespace Startup {
 }}   // namespace Kvasir::Startup
 
 #include "kvasir/StartUp/StartUp.hpp"
-

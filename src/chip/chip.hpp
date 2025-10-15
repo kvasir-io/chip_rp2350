@@ -16,8 +16,8 @@
 #include "peripherals/USB_DPRAM.hpp"
 #include "peripherals/WATCHDOG.hpp"
 //#include "peripherals/XIP_SSI.hpp"
-#include "peripherals/XOSC.hpp"
 #include "peripherals/PPB.hpp"
+#include "peripherals/XOSC.hpp"
 
 ///
 #include "Interrupt.hpp"

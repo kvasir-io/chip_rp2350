@@ -33,7 +33,8 @@
 #include "rp_common/bootrom_functions.hpp"
 #include "rp_common/chip_reset.hpp"
 #include "rp_common/clock_config.hpp"
+#include "rp_common/pwm.hpp"
 #include "rp_common/usb.hpp"
 #include "rp_common/watchdog.hpp"
 //#include "flash.hpp"
-//#include "pwm.hpp"
+

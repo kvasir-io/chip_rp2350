@@ -43946,7 +43946,7 @@ SPDX-License-Identifier: BSD-3-Clause
                                 <access>read-write</access>
                                 <bitRange>[11:0]</bitRange>
                                 <name>DIV_16</name>
-                                </field>
+                            </field>
                         </fields>
                         <name>DIV</name>
                         <resetValue>0x00000010</resetValue>

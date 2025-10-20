@@ -8,11 +8,21 @@ on:
 jobs:
     rp2350-build-push:
         runs-on: ubuntu-latest
+        outputs:
+            build-date: ${{ steps.set-date.outputs.build-date }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
               with:
                 submodules: recursive
+
+            - name: Set build date
+              id: set-date
+              run: |
+                # Get current date in YYYY.MM.DD format (Arch ISO style)
+                BUILD_DATE=$(date +%Y.%m.%d)
+                echo "build-date=$BUILD_DATE" >> $GITHUB_OUTPUT
+                echo "Build date: $BUILD_DATE"
 
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
@@ -32,6 +42,7 @@ jobs:
                 platforms: linux/amd64
                 tags: |
                     kvasirio/rp2350:latest
+                    kvasirio/rp2350:${{ steps.set-date.outputs.build-date }}
                 cache-from: type=gha
                 cache-to: type=gha,mode=max
 
@@ -85,6 +96,7 @@ jobs:
                   echo "" >> $GITHUB_STEP_SUMMARY
                   echo "**Image Tags:**" >> $GITHUB_STEP_SUMMARY
                   echo "- \`kvasirio/rp2350:latest\`" >> $GITHUB_STEP_SUMMARY
+                  echo "- \`kvasirio/rp2350:${{ needs.rp2350-build-push.outputs.build-date }}\`" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
                   echo "[View on DockerHub](https://hub.docker.com/r/kvasirio/rp2350)" >> $GITHUB_STEP_SUMMARY
                 fi

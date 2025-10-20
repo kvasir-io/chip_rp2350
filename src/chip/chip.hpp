@@ -18,7 +18,8 @@
 //#include "peripherals/XIP_SSI.hpp"
 #include "peripherals/PPB.hpp"
 #include "peripherals/XOSC.hpp"
-
+///
+#include "PinConfig.hpp"
 ///
 #include "Interrupt.hpp"
 #include "StartUp.hpp"
@@ -37,4 +38,3 @@
 #include "rp_common/usb.hpp"
 #include "rp_common/watchdog.hpp"
 //#include "flash.hpp"
-

@@ -1,14 +1,14 @@
 #pragma once
 #include "core/core.hpp"
 #include "kvasir/Common/Core.hpp"
+#include "picobin.hpp"
 
 #include <array>
 #include <cstdint>
 
 namespace Kvasir { namespace Startup {
-    //TODO placeholder for simple app to be recognices by bootrom replace by proper generation
-    [[gnu::used, gnu::section(".after_vectors")]] static constexpr std::array<std::uint32_t, 5>
-      ImageDef{0xffffded3, 0x10210142, 0x000001ff, 0x00000000, 0xab123579};
+    [[gnu::used, gnu::section(".after_vectors")]] static constexpr auto ImageDef
+      = Picobin::BlockLoop<Picobin::Block<Picobin::ArmSecure>>::words;
 
     template<typename... Ts>
     struct FirstInitStep<Tag::User, Ts...> {

@@ -2,7 +2,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../core/cmake/core.cmake)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../src/chip/rp_common/pioasm ${CMAKE_BINARY_DIR}/chip_pioasm)
 
 set(TARGET_MPU RP2350_M33_0)
-set(TARGET_UF2_CODE 0xE48BFF5B)
+set(TARGET_UF2_CODE 0xE48BFF59)
 set(TARGET_FLASH_SIZE 4194048)
 set(TARGET_RAM_SIZE 524288)
 set(TARGET_EEPROM_SIZE 0)

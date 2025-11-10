@@ -1,3 +1,5 @@
+#pragma once
+
 #include "rp_common/PinConfig.hpp"
 
 namespace Kvasir { namespace PinConfig {

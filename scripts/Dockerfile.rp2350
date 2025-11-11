@@ -2,5 +2,8 @@ FROM kvasirio/kvasir:latest AS rp2350_dev
 
 ENV CHIP_ROOT=/opt/chip
 COPY . ${CHIP_ROOT}/
+
+RUN su aur_user -c "yay -S --cleanafter --noconfirm --disable-download-timeout --removemake picotool"
+
 RUN git config --global --add safe.directory ${CHIP_ROOT}
 ENTRYPOINT ["/opt/kvasir/scripts/entrypoint.sh"]

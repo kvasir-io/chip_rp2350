@@ -15,17 +15,12 @@ namespace Kvasir { namespace Startup {
         void operator()() {
             Core::startup();
 
-            using PPB = Kvasir::Peripheral::PPB::Registers<0>;
+            using PPB_S = Kvasir::Peripheral::PPB::Registers<0>;
 
             //enable FPU and RCP coprocessor
-            apply(PPB::CPACR::overrideDefaults(write(PPB::CPACR::cp11, Register::value<3>()),
-                                               write(PPB::CPACR::cp10, Register::value<3>()),
-                                               write(PPB::CPACR::cp7, Register::value<3>())),
-                  PPB::NSACR::overrideDefaults(write(PPB::NSACR::cp11, Register::value<1>()),
-                                               write(PPB::NSACR::cp10, Register::value<1>()),
-                                               write(PPB::NSACR::cp7, Register::value<1>())));
-
-            using Reset = Kvasir::Peripheral::RESETS::Registers<>::RESET;
+            apply(PPB_S::CPACR::overrideDefaults(write(PPB_S::CPACR::cp11, Register::value<3>()),
+                                                 write(PPB_S::CPACR::cp10, Register::value<3>()),
+                                                 write(PPB_S::CPACR::cp7, Register::value<3>())));
 
             using Reset = Kvasir::Peripheral::RESETS::Registers<>::RESET;
             apply(set(Reset::usbctrl),

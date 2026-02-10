@@ -4003,7 +4003,7 @@ SPDX-License-Identifier: BSD-3-Clause
             </addressBlock>
             <registers>
                 <cluster>
-                    <dim>47</dim>
+                    <dim>48</dim>
                     <dimIncrement>0x4</dimIncrement>
                     <name>GPIO[%s]</name>
                     <description />
@@ -4012,6 +4012,12 @@ SPDX-License-Identifier: BSD-3-Clause
                         <addressOffset>0x0000</addressOffset>
                         <description>Pad control register</description>
                         <fields>
+                            <field>
+                                <name>ISO</name>
+                                <description>Pad isolation control. Remove this once the pad is configured by software.</description>
+                                <bitRange>[8:8]</bitRange>
+                                <access>read-write</access>
+                            </field>
                             <field>
                                 <access>read-write</access>
                                 <bitRange>[7:7]</bitRange>
@@ -8140,7 +8146,7 @@ SPDX-License-Identifier: BSD-3-Clause
             </interrupt>
             <registers>
                 <cluster>
-                    <dim>47</dim>
+                    <dim>48</dim>
                     <dimIncrement>0x8</dimIncrement>
                     <name>GPIO[%s]</name>
                     <description />

@@ -47,32 +47,94 @@ namespace Kvasir { namespace PinConfig {
 
     template<>
     struct UartPinMap<ChipVariant::RP2350A> {
-        static constexpr std::array<UartPinType, 30> pins
-          = {UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0,
-             UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx0, UartPinType::Rx0};
+        using PinEntry                                 = std::pair<UartPinType, UartPinType>;
+        static constexpr std::array<PinEntry, 30> pins = {
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0},
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0}
+        };
     };
 
     template<>
     struct UartPinMap<ChipVariant::RP2350B> {
-        static constexpr std::array<UartPinType, 48> pins
-          = {UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0,
-             UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0,
-             UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx1, UartPinType::Rx1, UartPinType::Cts1, UartPinType::Rts1,
-             UartPinType::Tx0, UartPinType::Rx0, UartPinType::Cts0, UartPinType::Rts0};
+        using PinEntry                                 = std::pair<UartPinType, UartPinType>;
+        static constexpr std::array<PinEntry, 48> pins = {
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0},
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0},
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx1,  UartPinType::Tx1},
+          PinEntry{UartPinType::Rx1,  UartPinType::Rx1},
+          PinEntry{UartPinType::Tx1, UartPinType::Cts1},
+          PinEntry{UartPinType::Rx1, UartPinType::Rts1},
+          PinEntry{UartPinType::Tx0,  UartPinType::Tx0},
+          PinEntry{UartPinType::Rx0,  UartPinType::Rx0},
+          PinEntry{UartPinType::Tx0, UartPinType::Cts0},
+          PinEntry{UartPinType::Rx0, UartPinType::Rts0}
+        };
     };
 
     template<>

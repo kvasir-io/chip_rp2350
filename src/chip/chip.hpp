@@ -24,6 +24,7 @@
 #include "Interrupt.hpp"
 #include "StartUp.hpp"
 #include "core/core.hpp"
+#include "rp_common/ADC.hpp"
 #include "rp_common/CRC.hpp"
 #include "rp_common/DMA.hpp"
 #include "rp_common/I2C.hpp"

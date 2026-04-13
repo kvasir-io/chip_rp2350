@@ -28,6 +28,7 @@
 #include "rp_common/CRC.hpp"
 #include "rp_common/DMA.hpp"
 #include "rp_common/I2C.hpp"
+#include "rp_common/I2CQueued.hpp"
 #include "rp_common/Io.hpp"
 #include "rp_common/PIO.hpp"
 #include "rp_common/SPI.hpp"

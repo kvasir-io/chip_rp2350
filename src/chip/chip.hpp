@@ -41,3 +41,4 @@
 #include "rp_common/usb.hpp"
 #include "rp_common/watchdog.hpp"
 //#include "flash.hpp"
+#include "kvasir/Register/RegisterFmt.hpp"

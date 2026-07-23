@@ -72,7 +72,7 @@ namespace Kvasir { namespace Startup {
                   set(PSM_WDSEL::bootram),
                   set(PSM_WDSEL::rom),
                   set(PSM_WDSEL::busfabric),
-                  set(PSM_WDSEL::psm_ready),
+                  set(PSM_WDSEL::ready),
                   set(PSM_WDSEL::clocks),
                   set(PSM_WDSEL::resets),
                   set(PSM_WDSEL::xosc),

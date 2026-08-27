@@ -8163,18 +8163,6 @@ SPDX-License-Identifier: BSD-3-Clause
                             </field>
                             <field>
                                 <access>read-only</access>
-                                <bitRange>[24:24]</bitRange>
-                                <description>interrupt from pad before override is applied</description>
-                                <name>IRQFROMPAD</name>
-                            </field>
-                            <field>
-                                <access>read-only</access>
-                                <bitRange>[19:19]</bitRange>
-                                <description>input signal to peripheral, after override is applied</description>
-                                <name>INTOPERI</name>
-                            </field>
-                            <field>
-                                <access>read-only</access>
                                 <bitRange>[17:17]</bitRange>
                                 <description>input signal from pad, before override is applied</description>
                                 <name>INFROMPAD</name>
@@ -8187,21 +8175,9 @@ SPDX-License-Identifier: BSD-3-Clause
                             </field>
                             <field>
                                 <access>read-only</access>
-                                <bitRange>[12:12]</bitRange>
-                                <description>output enable from selected peripheral, before register override is applied</description>
-                                <name>OEFROMPERI</name>
-                            </field>
-                            <field>
-                                <access>read-only</access>
                                 <bitRange>[9:9]</bitRange>
                                 <description>output signal to pad after register override is applied</description>
                                 <name>OUTTOPAD</name>
-                            </field>
-                            <field>
-                                <access>read-only</access>
-                                <bitRange>[8:8]</bitRange>
-                                <description>output signal from selected peripheral, before register override is applied</description>
-                                <name>OUTFROMPERI</name>
                             </field>
                         </fields>
                         <name>STATUS</name>
@@ -8267,7 +8243,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             </field>
                             <field>
                                 <access>read-write</access>
-                                <bitRange>[13:12]</bitRange>
+                                <bitRange>[15:14]</bitRange>
                                 <enumeratedValues>
                                     <enumeratedValue>
                                         <description>drive output enable from peripheral signal selected by funcsel</description>
@@ -8294,7 +8270,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             </field>
                             <field>
                                 <access>read-write</access>
-                                <bitRange>[9:8]</bitRange>
+                                <bitRange>[13:12]</bitRange>
                                 <enumeratedValues>
                                     <enumeratedValue>
                                         <description>drive output from peripheral signal selected by funcsel</description>
@@ -8325,46 +8301,70 @@ SPDX-License-Identifier: BSD-3-Clause
                                 <description>0-31 -&gt; selects pin function according to the gpio table\n 31 == NULL</description>
                                 <enumeratedValues>
                                     <enumeratedValue>
-                                        <name>jtag</name>
+                                        <description>JTAG on GPIO0-3, HSTX on GPIO12-19; unavailable on other pins</description>
+                                        <name>jtag_hstx</name>
                                         <value>0</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
+                                        <description>SPI0/SPI1</description>
                                         <name>spi</name>
                                         <value>1</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
+                                        <description>UART0/UART1</description>
                                         <name>uart</name>
                                         <value>2</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
+                                        <description>I2C0/I2C1</description>
                                         <name>i2c</name>
                                         <value>3</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
+                                        <description>PWM slice A/B input or output</description>
                                         <name>pwm</name>
                                         <value>4</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
+                                        <description>Software control of the pin via SIO</description>
                                         <name>sio</name>
                                         <value>5</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
+                                        <description>PIO0</description>
                                         <name>pio0</name>
                                         <value>6</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
+                                        <description>PIO1</description>
                                         <name>pio1</name>
                                         <value>7</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
-                                        <name>clock</name>
+                                        <description>PIO2</description>
+                                        <name>pio2</name>
                                         <value>8</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
-                                        <name>usb</name>
+                                        <description
+                                            >XIP CS1, CoreSight trace or clock GPIN/GPOUT depending on pin; unavailable on most
+                                            pins</description
+                                        >
+                                        <name>misc</name>
                                         <value>9</value>
                                     </enumeratedValue>
                                     <enumeratedValue>
+                                        <description>USB power-control muxing (VBUS detect/enable, overcurrent detect)</description>
+                                        <name>usb</name>
+                                        <value>10</value>
+                                    </enumeratedValue>
+                                    <enumeratedValue>
+                                        <description>Second UART mapping, on even/odd pin pairs GPIO2/3 through GPIO46/47</description>
+                                        <name>uart_aux</name>
+                                        <value>11</value>
+                                    </enumeratedValue>
+                                    <enumeratedValue>
+                                        <description>No function selected; pin is driven by neither peripheral nor SIO</description>
                                         <name>null</name>
                                         <value>31</value>
                                     </enumeratedValue>

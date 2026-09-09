@@ -79,6 +79,19 @@ struct InterruptImpl<PinConfig::ChipVariant::RP2350A> : CoreInterrupts {
           = {nonMaskableInt.index(), sVCall.index(), hardFault.index()};
         static constexpr std::array noSetPriority = {nonMaskableInt.index(), hardFault.index()};
 
+        // Lines that exist once per core: their enable and status are banked, so both cores
+        // may install a handler. Every other line reaches both NVICs and belongs to one core
+        // (Startup refuses it in both vector tables).
+        static constexpr std::array perCore = {io_bank0.index(),
+                                               io_bank0_ns.index(),
+                                               io_qspi.index(),
+                                               io_qspi_ns.index(),
+                                               sio_fifo.index(),
+                                               sio_bell.index(),
+                                               sio_fifo_ns.index(),
+                                               sio_bell_ns.index(),
+                                               sio_mtimecmp.index()};
+
         using FaultInterruptIndexs           = brigand::list<decltype(hardFault),
                                                              decltype(memoryManagement),
                                                              decltype(busFault),

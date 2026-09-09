@@ -50917,6 +50917,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Perform an atomic bit-set on GPIO_OUT, i.e. `GPIO_OUT |= wdata`</description>
                             <bitRange>[31:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -50933,31 +50934,37 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>QSPI_SD</name>
                             <bitRange>[31:28]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_CSN</name>
                             <bitRange>[27:27]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_SCK</name>
                             <bitRange>[26:26]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DM</name>
                             <bitRange>[25:25]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DP</name>
                             <bitRange>[24:24]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>GPIO</name>
                             <bitRange>[15:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -50972,6 +50979,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Perform an atomic bit-clear on GPIO_OUT, i.e. `GPIO_OUT &amp;= ~wdata`</description>
                             <bitRange>[31:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -50988,31 +50996,37 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>QSPI_SD</name>
                             <bitRange>[31:28]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_CSN</name>
                             <bitRange>[27:27]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_SCK</name>
                             <bitRange>[26:26]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DM</name>
                             <bitRange>[25:25]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DP</name>
                             <bitRange>[24:24]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>GPIO</name>
                             <bitRange>[15:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -51027,6 +51041,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Perform an atomic bitwise XOR on GPIO_OUT, i.e. `GPIO_OUT ^= wdata`</description>
                             <bitRange>[31:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -51043,31 +51058,37 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>QSPI_SD</name>
                             <bitRange>[31:28]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_CSN</name>
                             <bitRange>[27:27]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_SCK</name>
                             <bitRange>[26:26]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DM</name>
                             <bitRange>[25:25]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DP</name>
                             <bitRange>[24:24]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>GPIO</name>
                             <bitRange>[15:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -51152,6 +51173,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Perform an atomic bit-set on GPIO_OE, i.e. `GPIO_OE |= wdata`</description>
                             <bitRange>[31:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -51168,31 +51190,37 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>QSPI_SD</name>
                             <bitRange>[31:28]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_CSN</name>
                             <bitRange>[27:27]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_SCK</name>
                             <bitRange>[26:26]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DM</name>
                             <bitRange>[25:25]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DP</name>
                             <bitRange>[24:24]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>GPIO</name>
                             <bitRange>[15:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -51207,6 +51235,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Perform an atomic bit-clear on GPIO_OE, i.e. `GPIO_OE &amp;= ~wdata`</description>
                             <bitRange>[31:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -51223,31 +51252,37 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>QSPI_SD</name>
                             <bitRange>[31:28]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_CSN</name>
                             <bitRange>[27:27]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_SCK</name>
                             <bitRange>[26:26]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DM</name>
                             <bitRange>[25:25]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DP</name>
                             <bitRange>[24:24]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
                             <name>GPIO</name>
                             <bitRange>[15:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -51262,6 +51297,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Perform an atomic bitwise XOR on GPIO_OE, i.e. `GPIO_OE ^= wdata`</description>
                             <bitRange>[31:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -51278,31 +51314,37 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>QSPI_SD</name>
                             <bitRange>[31:28]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_CSN</name>
                             <bitRange>[27:27]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>QSPI_SCK</name>
                             <bitRange>[26:26]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DM</name>
                             <bitRange>[25:25]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USB_DP</name>
                             <bitRange>[24:24]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                         <field>
                             <name>GPIO</name>
                             <bitRange>[15:0]</bitRange>
                             <access>write-only</access>
+                            <modifiedWriteValues>oneToToggle</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>

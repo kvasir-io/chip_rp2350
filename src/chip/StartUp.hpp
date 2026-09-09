@@ -1,7 +1,9 @@
 #pragma once
+#include "chip/rp_common/ResetMap.hpp"
 #include "core/core.hpp"
 #include "kvasir/Common/Core.hpp"
 #include "picobin.hpp"
+#include "rp_common/Multicore.hpp"
 
 #include <array>
 #include <cstdint>
@@ -21,6 +23,18 @@ namespace Kvasir { namespace Startup {
             apply(PPB_S::CPACR::overrideDefaults(write(PPB_S::CPACR::cp11, Register::value<3>()),
                                                  write(PPB_S::CPACR::cp10, Register::value<3>()),
                                                  write(PPB_S::CPACR::cp7, Register::value<3>())));
+
+#if defined(KVASIR_MULTICORE) && KVASIR_MULTICORE
+            // Exclusive accesses (ldrex/strex, i.e. every std::atomic RMW and every
+            // Atomic::Spinlock) only reach the bus fabric's global monitor for memory the
+            // core treats as shareable, and by default nothing is. Without this bit the
+            // two cores' exclusives never arbitrate: both strex succeed, and a lock holds
+            // or fails depending on which core is a cycle ahead. EXTEXCLALL sends every
+            // exclusive to the global monitor. Per core: SecondaryCoreInit sets it on
+            // core 1. (pico-sdk: spinlock_set_extexclall.)
+            apply(set(PPB_S::ACTLR::extexclall));
+            asm volatile("dsb\n isb" ::: "memory");
+#endif
 
             using Reset = Kvasir::Peripheral::RESETS::Registers<>::RESET;
             apply(set(Reset::usbctrl),
@@ -111,6 +125,36 @@ namespace Kvasir { namespace Startup {
                   set(WDSEL::busctrl),
                   set(WDSEL::adc));
         }
+    };
+
+    // What core 1 must do for itself on entry. The bootrom parks core 1 with only cp7 (the
+    // RCP) enabled in CPACR; the FPU is off, and a hard-float build touches it in its first
+    // frame. SecondaryCore's trampoline ORs this mask into CPACR before any compiled code
+    // runs. cp7 is kept in the mask so a ROM call from core 1 (which uses RCP instructions)
+    // keeps working even if the trampoline ever wrote instead of ORed. Everything else in
+    // FirstInitStep above (resets, PSM, watchdog select) is chip-wide and core 0's job.
+    template<typename... Ts>
+    struct SecondaryCoreInit<Tag::User, Ts...> {
+        static constexpr std::uint32_t cpacrEnable
+          = Core::SecondaryCoreTraits::cpacrEnable | (3U << 14U);   // + cp7
+
+        // The counterpart of the EXTEXCLALL write in FirstInitStep: without it core 1's
+        // exclusives use its local monitor only and no lock in the system holds.
+        void operator()() {
+            using PPB_S = Kvasir::Peripheral::PPB::Registers<0>;
+            apply(set(PPB_S::ACTLR::extexclall));
+            asm volatile("dsb\n isb" ::: "memory");
+        }
+
+        // From core 0: the FIFO handshake with the bootrom's holding pen, and the PSM reset
+        // that puts core 1 back into it.
+        [[nodiscard]] static bool launch(std::uint32_t entry,
+                                         std::uint32_t sp,
+                                         std::uint32_t vtor) {
+            return Multicore::launchCore1(entry, sp, vtor);
+        }
+
+        static void reset() { Multicore::resetCore1(); }
     };
 }}   // namespace Kvasir::Startup
 

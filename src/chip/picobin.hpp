@@ -98,6 +98,16 @@ namespace Kvasir { namespace Picobin {
         constexpr std::uint32_t NONE = 0;
     }   // namespace Permissions
 
+    // The location word of a partition entry, the inverse of permissions_and_location():
+    // the first and last sector (4 KB units) in two 13-bit fields below the permissions.
+    constexpr std::uint32_t firstSector(std::uint32_t locationWord) {
+        return locationWord & 0x1FFFU;
+    }
+
+    constexpr std::uint32_t lastSector(std::uint32_t locationWord) {
+        return (locationWord >> 13) & 0x1FFFU;
+    }
+
     namespace PartitionFlags {
         constexpr std::uint32_t HAS_ID   = 0x00000001u;
         constexpr std::uint32_t HAS_NAME = 0x00001000u;

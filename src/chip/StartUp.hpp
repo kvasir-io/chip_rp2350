@@ -17,6 +17,17 @@ namespace Kvasir { namespace Startup {
         void operator()() {
             Core::startup();
 
+            // Core 1 back into the bootrom's holding pen, before this image touches RAM. A
+            // debugger's flash-and-reset restarts core 0 only: a core 1 the image before had
+            // launched keeps running that image's code -- out of RAM this one is about to
+            // fill with its own data, and from there anywhere. Seen 2026-09-19 (i2c_testing):
+            // a firmware that never starts core 1, flashed over one that had it spinning in a
+            // RAM loop, got a sanitizer report from a function no path could have reached with
+            // that state, log lines with absurd values on core 1's log ring, and core 1 found
+            // in lockup (PC 0xEFFFFFFE) afterwards. PSM FRCE_OFF.PROC1 (data sheet, table
+            // 531); it is the one FRCE_OFF bit erratum RP2350-E19 allows to be set.
+            Multicore::resetCore1();
+
             using PPB_S = Kvasir::Peripheral::PPB::Registers<0>;
 
             //enable FPU and RCP coprocessor

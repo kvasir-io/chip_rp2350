@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """The RP2350 bench commands' parts that need no board."""
 import importlib.util
+import sys
 import unittest
 from pathlib import Path
+
+sys.dont_write_bytecode = True  # no __pycache__ next to the imported tools
 
 spec = importlib.util.spec_from_file_location(
     "kvasir_bench_chip", Path(__file__).resolve().parent / "kvasir_bench_chip.py")

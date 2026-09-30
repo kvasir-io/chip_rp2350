@@ -2,6 +2,7 @@
 #include "chip/rp_common/ResetMap.hpp"
 #include "core/core.hpp"
 #include "kvasir/Common/Core.hpp"
+#include "kvasir/StartUp/LinkerSymbols.hpp"
 #include "picobin.hpp"
 #include "rp_common/Multicore.hpp"
 
@@ -16,6 +17,20 @@ namespace Kvasir { namespace Startup {
     struct FirstInitStep<Tag::User, Ts...> {
         void operator()() {
             Core::startup();
+
+            // VTOR at this image's own table. The bootrom points it where it found the image:
+            // for a flash image that is the table, but for a RAM image packaged in flash (a
+            // load map and no VECTOR_TABLE item: `<product>_release_ram_only_packaged.uf2`) it
+            // is the flash copy -- every exception vector then comes through XIP, and
+            // isFlashBinary() calls the image FLASH. The shipped image already runs with VTOR
+            // here (its decryption bootloader sets it), so for it this changes nothing.
+            // VTOR = 0xE000ED08, TBLOFF bits [31:7] (Armv8-M ARM DDI0553B.y D1.2.272, RP2350
+            // data sheet Table 202). The table has to be naturally aligned (B3.30, RVDPD): 68
+            // entries -> 512 bytes; it is the first thing at ORIGIN(flash) / ORIGIN(ram).
+            apply(write(Kvasir::Peripheral::SCB::Registers<>::VTOR::FULLREGISTER,
+                        static_cast<std::uint32_t>(
+                          reinterpret_cast<std::uintptr_t>(&_LINKER_vectors_start_))));
+            asm volatile("dsb\n isb" ::: "memory");
 
             // Core 1 back into the bootrom's holding pen, before this image touches RAM. A
             // debugger's flash-and-reset restarts core 0 only: a core 1 the image before had

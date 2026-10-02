@@ -36,6 +36,7 @@
 #include "rp_common/Io.hpp"
 #include "rp_common/Multicore.hpp"
 #include "rp_common/PIO.hpp"
+#include "rp_common/RegisterAlias.hpp"   // before every driver: Register::atomic on the aliases
 #include "rp_common/SPI.hpp"
 #include "rp_common/Sio.hpp"
 #include "rp_common/Timer.hpp"

@@ -20276,6 +20276,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[0:0]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.13 Table 1281) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -37959,6 +37961,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                             <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38003,6 +38026,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[6:4]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38061,6 +38105,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[1:1]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38097,6 +38162,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>high impedance mode select 0=not in high impedance mode, 1=in high impedance mode</description>
                             <bitRange>[1:1]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38135,6 +38221,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[1:1]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38150,6 +38257,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[12:12]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38175,6 +38303,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38198,6 +38347,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>enable brown-out detection 0=not enabled, 1=enabled</description>
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38223,6 +38393,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38244,6 +38435,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>This feature has been removed</description>
                             <bitRange>[1:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38434,6 +38646,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38628,6 +38861,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[3:0]</bitRange>
                             <access>read-only</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38644,6 +38898,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[10:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38679,6 +38954,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[3:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38716,6 +39012,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[5:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38752,6 +39069,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[5:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38779,6 +39117,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[1:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38797,6 +39156,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[5:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38817,6 +39197,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38835,6 +39236,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38855,6 +39277,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38870,6 +39313,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38887,6 +39351,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38903,6 +39388,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38918,6 +39424,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38962,6 +39489,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -38974,6 +39522,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>This field must only be written when POWMAN_ALARM_ENAB=0</description>
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -38988,6 +39557,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -39000,6 +39590,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>This field must only be written when POWMAN_ALARM_ENAB=0</description>
                             <bitRange>[15:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -39046,18 +39657,24 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>switch to gpio as the source of the 1kHz timer tick</description>
                             <bitRange>[10:10]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 512; the register also needs the 0x5AFE password) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USE_XOSC</name>
                             <description>switch to xosc as the source of the 1kHz timer tick</description>
                             <bitRange>[9:9]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 512; the register also needs the 0x5AFE password) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>USE_LPOSC</name>
                             <description>Switch to lposc as the source of the 1kHz timer tick</description>
                             <bitRange>[8:8]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 512; the register also needs the 0x5AFE password) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>ALARM</name>
@@ -39086,6 +39703,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[2:2]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 512; the register also needs the 0x5AFE password) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>RUN</name>
@@ -39187,6 +39806,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[5:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -39263,6 +39903,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>SOURCE</name>
                             <bitRange>[5:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -39341,6 +40002,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[5:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -39418,6 +40100,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[5:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -39468,6 +40171,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -39507,6 +40231,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                             <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
                     </fields>
                 </register>
                 <register>
@@ -39522,6 +40267,27 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[3:0]</bitRange>
                             <access>read-write</access>
+                        </field>
+                        <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
+                        <field>
+                            <name>PASSWORD</name>
+                            <description>Write 0x5AFE with every write, or the write is ignored</description>
+                            <bitRange>[31:16]</bitRange>
+                            <access>write-only</access>
+                            <writeConstraint>
+                                <range>
+                                    <minimum>0x5AFE</minimum>
+                                    <maximum>0x5AFE</maximum>
+                                </range>
+                            </writeConstraint>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>PASSWORD</name>
+                                    <value>0x5AFE</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
                         </field>
                     </fields>
                 </register>
@@ -39827,6 +40593,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Trigger a watchdog reset</description>
                             <bitRange>[31:31]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.9 Table 1248) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>ENABLE</name>
@@ -43866,6 +44634,8 @@ SPDX-License-Identifier: BSD-3-Clause
                                     until low. Counter must be running at less than full speed (div_int + div_frac / 16 &gt; 1)</description
                                 >
                                 <name>PH_ADV</name>
+                                <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC, reads 1 until done: 'Write a 1, and poll until low'; RP2350 datasheet 12.5 Table 1132) -->
+                                <modifiedWriteValues>oneToSet</modifiedWriteValues>
                             </field>
                             <field>
                                 <access>write-only</access>
@@ -43875,6 +44645,8 @@ SPDX-License-Identifier: BSD-3-Clause
                                     until low. Counter must be running.</description
                                 >
                                 <name>PH_RET</name>
+                                <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC, reads 1 until done: 'Write a 1, and poll until low'; RP2350 datasheet 12.5 Table 1132) -->
+                                <modifiedWriteValues>oneToSet</modifiedWriteValues>
                             </field>
                             <field>
                                 <access>read-write</access>
@@ -44640,6 +45412,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Start a single conversion. Self-clearing. Ignored if start_many is asserted.</description>
                             <bitRange>[2:2]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.4 Table 1121) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>TS_EN</name>
@@ -45347,6 +46121,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[7:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read pops the RX FIFO (or sets RX_UNDER), and every write pushes a TX FIFO entry: only whole-register writes (RP2350 datasheet 12.2 Table 1059) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>
@@ -48182,6 +48958,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[26:26]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>NEXTPREV_SM_DISABLE</name>
@@ -48192,6 +48970,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[25:25]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>NEXTPREV_SM_ENABLE</name>
@@ -48203,6 +48983,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[24:24]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>NEXT_PIO_MASK</name>
@@ -48218,6 +49000,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[23:20]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>PREV_PIO_MASK</name>
@@ -48231,6 +49015,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[19:16]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>CLKDIV_RESTART</name>
@@ -48247,6 +49033,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[11:8]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>SM_RESTART</name>
@@ -48259,6 +49047,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[7:4]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>SM_ENABLE</name>
@@ -53023,6 +53813,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[28:28]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 3.1 Table 85) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>PIX2_NOSHIFT</name>
@@ -53781,12 +54573,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Host: Reset bus</description>
                             <bitRange>[13:13]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1201) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>RESUME</name>
                             <description>Device: Remote wakeup. Device can initiate its own resume after suspend.</description>
                             <bitRange>[12:12]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1201) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>VBUS_EN</name>
@@ -53823,6 +54619,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Host: Stop transaction</description>
                             <bitRange>[4:4]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1201) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>RECEIVE_DATA</name>
@@ -53847,6 +54645,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Host: Start transaction</description>
                             <bitRange>[0:0]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1201) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                     </fields>
                 </register>
@@ -60929,6 +61729,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Execute instruction</description>
                             <bitRange>[30:30]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 13.9 Table 1334) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>IS_WR</name>
@@ -61201,6 +62003,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Clear counter before use</description>
                             <bitRange>[29:29]</bitRange>
                             <access>write-only</access>
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 13.9 Table 1346) -->
+                            <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>CNT_ENA</name>

@@ -5,6 +5,7 @@
 #include "kvasir/StartUp/LinkerSymbols.hpp"
 #include "picobin.hpp"
 #include "rp_common/Multicore.hpp"
+#include "rp_common/bootrom_functions.hpp"
 
 #include <array>
 #include <cstdint>
@@ -49,6 +50,32 @@ namespace Kvasir { namespace Startup {
             apply(PPB_S::CPACR::overrideDefaults(write(PPB_S::CPACR::cp11, Register::value<3>()),
                                                  write(PPB_S::CPACR::cp10, Register::value<3>()),
                                                  write(PPB_S::CPACR::cp7, Register::value<3>())));
+            asm volatile("dsb\n isb" ::: "memory");
+
+            // The RCP's salt, if nothing has written it: the boot ROM seeds it on its boot path,
+            // which an image a debugger started in RAM never went through. With the salt invalid
+            // any RCP instruction but canary_status and a salt write is an RCP fault (NMI), and
+            // the boot ROM's API functions run RCP canary checks (RP2350 datasheet 3.6.3.1,
+            // md l.5075-5081; 3.2.1, l.3799). Status 0xa500a500 valid / 0x00c300c3 invalid
+            // (l.5331); writing a valid salt is a fault too (l.5083). Core 0's salt only. The
+            // value: 64 ROSC RANDOMBIT reads (0x400e8000 + 0x20, md l.1552, l.28148), not a
+            // secret. Encodings as pico-sdk's hardware/rcp.h (rcp_canary_status, rcp_salt_core0).
+            {
+                std::uint32_t status{};
+                asm volatile("mrc p7, #1, %0, c0, c0, #0" : "=r"(status));
+                if(status == 0x00C3'00C3U) {
+                    auto const bit = []() {
+                        return *reinterpret_cast<std::uint32_t const volatile*>(0x400E'8020U) & 1U;
+                    };
+                    std::uint32_t lo{};
+                    std::uint32_t hi{};
+                    for(int i = 0; i != 32; ++i) {
+                        lo = (lo << 1) | bit();
+                        hi = (hi << 1) | bit();
+                    }
+                    asm volatile("mcrr p7, #8, %0, %1, c0" : : "r"(lo), "r"(hi) : "memory");
+                }
+            }
 
 #if defined(KVASIR_MULTICORE) && KVASIR_MULTICORE
             // Exclusive accesses (ldrex/strex, i.e. every std::atomic RMW and every
@@ -181,6 +208,21 @@ namespace Kvasir { namespace Startup {
         }
 
         static void reset() { Multicore::resetCore1(); }
+    };
+
+    // The stack guard's per-boot value: the boot ROM's BOOT_RANDOM, "a 128-bit random number
+    // generated on each boot" (RP2350 datasheet 5.4.8.17 get_sys_info, flag 0x0010, 4 words),
+    // from the TRNG ROSC sampled into SHA-256 on every boot (5.2 boot sequence, "Generate Boot
+    // Random"). get_sys_info returns the words filled: the supported-flags word, then the 4.
+    template<typename... Ts>
+    struct StackGuardEntropy<Tag::User, Ts...> {
+        std::uint32_t operator()() const {
+            constexpr std::uint32_t      BootRandom = 0x0010;
+            std::array<std::uint32_t, 5> buffer{};
+            auto const words = detail::get_sys_info(buffer.data(), buffer.size(), BootRandom);
+            if(words < 5 || (buffer[0] & BootRandom) == 0) { return 0xdeadc0deU; }
+            return buffer[1] ^ buffer[2] ^ buffer[3] ^ buffer[4];
+        }
     };
 }}   // namespace Kvasir::Startup
 

@@ -39,5 +39,24 @@ class QmiReadMode(unittest.TestCase):
                                    "8-bit mode byte A0h (quad), 16 dummy bits (quad), data quad")
 
 
+# QMI DIRECT_CSR from chip_rp2350/chip.svd: field -> (lsb, width)
+DIRECT_CSR = {"BUSY": (1, 1), "EN": (0, 1)}
+
+
+class QmiState(unittest.TestCase):
+    def test_the_stuck_qmi_read_on_the_feather(self):
+        # read after a probe reset during a flash write
+        busy, lines = chip.qmi_state(0x80C10803, 0x030B0003, DIRECT_CSR)
+        self.assertTrue(busy)
+        self.assertEqual(
+            lines[0], "QMI DIRECT_CSR 0x80c10803: BUSY 1, EN 1, stuck")
+        self.assertEqual(lines[1], "core 0 in LOCKUP (DHCSR 0x030b0003)")
+
+    def test_after_the_watchdog_reset(self):
+        busy, lines = chip.qmi_state(0x00C10800, 0x01000000, DIRECT_CSR)
+        self.assertFalse(busy)
+        self.assertEqual(lines[1], "core 0 running (DHCSR 0x01000000)")
+
+
 if __name__ == "__main__":
     unittest.main()

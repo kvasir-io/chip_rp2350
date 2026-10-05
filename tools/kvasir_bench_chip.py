@@ -61,6 +61,60 @@ def xip(bench, args) -> None:
         print("  flash: " + line)
 
 
+# DHCSR (Armv8-M ARM DDI0553B.y D1.2.39): S_LOCKUP bit 19, S_HALT bit 17
+DHCSR = 0xE000EDF0
+
+
+def qmi_state(direct_csr: int, dhcsr: int, f: dict) -> tuple[bool, list[str]]:
+    """Is the QMI stuck (a memory-mapped transfer that never ends), in words."""
+    busy = field(direct_csr, f, "BUSY") != 0
+    lockup = (dhcsr >> 19) & 1 != 0
+    lines = [f"QMI DIRECT_CSR {direct_csr:#010x}: BUSY {int(busy)}, EN {field(direct_csr, f, 'EN')}"
+             f"{', stuck' if busy else ''}",
+             f"core 0 {'in LOCKUP' if lockup else 'halted' if (dhcsr >> 17) & 1 else 'running'}"
+             f" (DHCSR {dhcsr:#010x})"]
+    return busy, lines
+
+
+def qmi_arguments(parser) -> None:
+    parser.add_argument("--recover", action="store_true",
+                        help="reset every power domain but PROC_COLD through the watchdog")
+
+
+def qmi(bench, args) -> None:
+    """A core reset from the probe while the firmware erases or programs its own flash leaves the
+    QMI with a memory-mapped transfer that never ends (DIRECT_CSR.BUSY, "set if a memory-mapped
+    transfer is in progress", RP2350 datasheet 12.14 Table 1294): the boot ROM waits for it and the
+    core locks up, every flash download fails. A core reset does not reset the QMI; a watchdog
+    reset with PSM.WDSEL covering XIP does."""
+    qbase, qregs = bench.svd("QMI")
+    _, (csr, dhcsr) = bench.read([qbase + qregs["DIRECT_CSR"][0], DHCSR])
+    busy, lines = qmi_state(csr, dhcsr, qregs["DIRECT_CSR"][1])
+    for line in lines:
+        print(line)
+    if not args.recover:
+        if busy:
+            print("  stuck: `--recover` resets the chip through the watchdog")
+        return
+    pbase, pregs = bench.svd("PSM")
+    wbase, wregs = bench.svd("WATCHDOG")
+    wdsel_at, fields = pregs["WDSEL"]
+    domains = 0
+    for name, (lsb, width) in fields.items():
+        if name != "PROC_COLD":
+            domains |= ((1 << width) - 1) << lsb
+    bench.write([(pbase + wdsel_at, domains)])
+    lsb, _ = wregs["CTRL"][1]["TRIGGER"]
+    try:  # the chip resets under this write: its read-back may fail
+        bench.write([(wbase + wregs["CTRL"][0], 1 << lsb)])
+    except Exception:
+        pass
+    print(f"watchdog reset of every domain (PSM.WDSEL {domains:#010x}) triggered: the printer "
+          "reconnects; check again with `chip B T qmi`")
+
+
 def commands() -> dict:
     return {"xip": ("XIP cache hits/misses per second and the QMI's flash read mode",
-                    xip_arguments, xip)}
+                    xip_arguments, xip),
+            "qmi": ("is the QMI stuck (flash downloads fail, core in lockup); --recover resets the chip",
+                    qmi_arguments, qmi)}

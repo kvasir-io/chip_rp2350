@@ -6,6 +6,9 @@ set(TARGET_FLASH_SIZE 4194048)
 set(TARGET_RAM_SIZE 532480) # 520 KiB: SRAM0-9, the datasheet's single 520 kB memory (RP2350 datasheet 4.2)
 set(TARGET_EEPROM_SIZE 0)
 set(TARGET_EXTRA_FLASH_SECTIONS .boot2)
+# IMAGE_CRC leaves the picobin block loop out (.after_vectors, linker/common_vectors_body.inc.ld): picotool seal and
+# sign rewrite its link word after the link, and the bootrom checks that block itself.
+set(TARGET_IMAGE_CRC_EXCLUDE _LINKER_INTERN_after_vectors_start_ _LINKER_INTERN_after_vectors_end_)
 
 # J-Link Commander lines after `connect` in the flash/reset/connect scripts (Kvasir_SDK cmake/jlink.cmake): core 1 back
 # into its boot ROM before anything is reset or written. The commander's `r` restarts the connected core only, and a

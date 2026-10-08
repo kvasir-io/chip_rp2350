@@ -36,7 +36,7 @@ namespace Kvasir { namespace Startup {
             // Core 1 back into the bootrom's holding pen, before this image touches RAM. A
             // debugger's flash-and-reset restarts core 0 only: a core 1 the image before had
             // launched keeps running that image's code -- out of RAM this one is about to
-            // fill with its own data, and from there anywhere. Seen 2026-09-19 (i2c_testing):
+            // fill with its own data, and from there anywhere. Seen:
             // a firmware that never starts core 1, flashed over one that had it spinning in a
             // RAM loop, got a sanitizer report from a function no path could have reached with
             // that state, log lines with absurd values on core 1's log ring, and core 1 found

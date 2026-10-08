@@ -12,11 +12,11 @@ set(TARGET_IMAGE_CRC_EXCLUDE _LINKER_INTERN_after_vectors_start_ _LINKER_INTERN_
 
 # J-Link Commander lines after `connect` in the flash/reset/connect scripts (Kvasir_SDK cmake/jlink.cmake): core 1 back
 # into its boot ROM before anything is reset or written. The commander's `r` restarts the connected core only, and a
-# core 1 the old image launched runs on through the erase into the new image's RAM (i2c_testing 2026-09-19). PSM
-# FRCE_OFF.PROC1 set, then cleared, through the atomic aliases: PSM_BASE 0x40018000 + FRCE_OFF 0x4, PROC1 = bit 24
-# (RP2350 datasheet 7.4.4 "List of registers", Table 531), +0x2000 set / +0x3000 clear (2.1.3 "Atomic register access").
-# uc_log's printer gets the same lines (util.cmake PRE_RESET_COMMANDS -> --pre_reset_command) and writes them before its
-# own resets and downloads - it understands only `w4 <address> <value>`, keep them to that.
+# core 1 the old image launched runs on through the erase into the new image's RAM. PSM FRCE_OFF.PROC1 set, then
+# cleared, through the atomic aliases: PSM_BASE 0x40018000 + FRCE_OFF 0x4, PROC1 = bit 24 (RP2350 datasheet 7.4.4 "List
+# of registers", Table 531), +0x2000 set / +0x3000 clear (2.1.3 "Atomic register access"). uc_log's printer gets the
+# same lines (util.cmake PRE_RESET_COMMANDS -> --pre_reset_command) and writes them before its own resets and downloads
+# - it understands only `w4 <address> <value>`, keep them to that.
 set(TARGET_JLINK_CONNECT_COMMANDS "w4 0x4001A004 0x01000000" "w4 0x4001B004 0x01000000")
 
 set(LINKER_FILE ${CMAKE_CURRENT_LIST_DIR}/../linker/chip.ld)

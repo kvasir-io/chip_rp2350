@@ -44,7 +44,7 @@ DIRECT_CSR = {"BUSY": (1, 1), "EN": (0, 1)}
 
 
 class QmiState(unittest.TestCase):
-    def test_the_stuck_qmi_read_on_the_feather(self):
+    def test_the_stuck_qmi_read(self):
         # read after a probe reset during a flash write
         busy, lines = chip.qmi_state(0x80C10803, 0x030B0003, DIRECT_CSR)
         self.assertTrue(busy)

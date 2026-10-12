@@ -44,6 +44,11 @@ namespace Kvasir { namespace Startup {
             // 531); it is the one FRCE_OFF bit erratum RP2350-E19 allows to be set.
             Multicore::resetCore1();
 
+            // Watchdog off until the image arms it: only a chip-level reset resets it (RP2350 datasheet 12.9.1), so
+            // a watchdog reboot leaves CTRL.ENABLE set and a later flash download reloads the counter. Not valid
+            // under TBYB (5.1.17), where the watchdog is the boot ROM's; picobin.hpp ImageDef never sets TBYB.
+            apply(clear(Kvasir::Peripheral::WATCHDOG::Registers<>::CTRL::enable));
+
             using PPB_S = Kvasir::Peripheral::PPB::Registers<0>;
 
             //enable FPU and RCP coprocessor
@@ -180,6 +185,16 @@ namespace Kvasir { namespace Startup {
         }
     };
 
+}}   // namespace Kvasir::Startup
+
+#if defined(KVASIR_MULTICORE) && KVASIR_MULTICORE && !(defined(KVASIR_RAM_ONLY) && KVASIR_RAM_ONLY)
+    // Multicore flash images only (armed by SecondaryCoreInit::armCoreResetGuard); included below FirstInitStep so
+    // its source lines, which a sanitizer records, do not move
+    #include "CoreResetGuard.hpp"
+#endif
+
+namespace Kvasir { namespace Startup {
+
     // What core 1 must do for itself on entry. The bootrom parks core 1 with only cp7 (the
     // RCP) enabled in CPACR; the FPU is off, and a hard-float build touches it in its first
     // frame. SecondaryCore's trampoline ORs this mask into CPACR before any compiled code
@@ -208,6 +223,14 @@ namespace Kvasir { namespace Startup {
         }
 
         static void reset() { Multicore::resetCore1(); }
+
+        // Called by SecondaryCore's runtimeInit before core 1 starts, unless its list holds
+        // Kvasir::Startup::NoCoreResetGuard (CoreResetGuard.hpp). No-op in a RAM image.
+        static void armCoreResetGuard() {
+#if defined(KVASIR_MULTICORE) && KVASIR_MULTICORE && !(defined(KVASIR_RAM_ONLY) && KVASIR_RAM_ONLY)
+            Kvasir::CoreResetGuard::runtimeInit();
+#endif
+        }
     };
 
     // The stack guard's per-boot value: the boot ROM's BOOT_RANDOM, "a 128-bit random number

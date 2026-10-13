@@ -43,6 +43,41 @@ set(LINKER_FILE ${CMAKE_CURRENT_LIST_DIR}/../linker/chip.ld)
 # For kvasir_executable(... RAM_ONLY): everything in SRAM, no flash region.
 set(LINKER_FILE_RAM_ONLY ${CMAKE_CURRENT_LIST_DIR}/../linker/chip_ram_only.ld)
 
+# double arithmetic, compares, int/float conversions and sqrt on the double-precision coprocessor (RP2350 datasheet
+# 3.6.2) instead of the runtime's soft-float: each linked as --wrap=<name>, the runtime's own one stays __real_<name>.
+# StartUp.hpp enables cp4 on both cores either way.
+option(KVASIR_RP2350_DCP "RP2350: the compiler runtime's double functions on the DCP" ON)
+if(KVASIR_RP2350_DCP)
+    set(CHIP_SOURCES ${CMAKE_CURRENT_LIST_DIR}/../src/chip/dcp_double.S)
+    set(CHIP_LINKER_OPTIONS)
+    foreach(
+        f
+        __aeabi_dadd
+        __aeabi_dsub
+        __aeabi_drsub
+        __aeabi_dmul
+        __aeabi_ddiv
+        __aeabi_dcmpun
+        __aeabi_cdrcmple
+        __aeabi_cdcmple
+        __aeabi_cdcmpeq
+        __aeabi_dcmpeq
+        __aeabi_dcmplt
+        __aeabi_dcmple
+        __aeabi_dcmpge
+        __aeabi_dcmpgt
+        __aeabi_d2f
+        __aeabi_i2d
+        __aeabi_ui2d
+        __aeabi_d2iz
+        __aeabi_d2uiz
+        sqrt)
+        list(APPEND CHIP_LINKER_OPTIONS --wrap=${f})
+    endforeach()
+    # for code that must know: a double subnormal is flushed to zero on input and output (RP2350 datasheet 3.6.2)
+    list(APPEND CHIP_OPTIONS -DKVASIR_RP2350_DCP=1)
+endif()
+
 # the write-only guard: every write-only field of the SVD is classified (oneToSet, a key, or <!-- Kvasir: write-only
 # accepted -->), so a new one stops the build; registers with no readable field are never read
 svd_convert(

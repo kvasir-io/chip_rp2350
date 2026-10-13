@@ -64,9 +64,13 @@ namespace Kvasir { namespace Mpu {
     // (0: kMair0Attr0), EN[0]. Fields: RP2350 datasheet 3.7, Tables 233 (MPU_CTRL), 235, 236; the
     // AP encodings: Armv8-M ARM DDI0553B.y D1.2.171.
     constexpr Words encode(Region const& r) {
-        return {.rbar
-                = (r.begin & ~0x1FU) | (r.readOnly ? 0b10U << 1U : 0U) | (r.execute ? 0U : 1U),
-                .rlar = ((r.end - 1U) & ~0x1FU) | 1U};
+        using Ppb = Kvasir::Peripheral::PPB::Registers<0>;
+        using Kvasir::Register::deposit;
+        return {.rbar = deposit(Ppb::MPU_RBAR::base, r.begin >> 5U) | deposit(Ppb::MPU_RBAR::sh, 0U)
+                      | deposit(Ppb::MPU_RBAR::ap, r.readOnly ? 0b10U : 0U)
+                      | deposit(Ppb::MPU_RBAR::xn, r.execute ? 0U : 1U),
+                .rlar = deposit(Ppb::MPU_RLAR::limit, (r.end - 1U) >> 5U)
+                      | deposit(Ppb::MPU_RLAR::attrindx, 0U) | deposit(Ppb::MPU_RLAR::en, 1U)};
     }
 
     constexpr bool valid(Region const& r) {
@@ -79,15 +83,11 @@ namespace Kvasir { namespace Mpu {
 
     inline constexpr std::size_t kRegions = 5;   // of the chip's 8
 
+    // a linker symbol's address as a run-time value: an empty section's start == end must not fold to false and the
+    // empty region be programmed (LinkerSymbols.hpp)
     template<auto& Symbol>
     std::uint32_t at() {
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast): a linker symbol's address
-        auto address = static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(&Symbol));
-        // The symbols are declared as functions, and the compiler takes two functions for two
-        // addresses: an empty section's start == end could fold to false and the empty region be
-        // programmed. A run-time value compares as it is.
-        asm("" : "+r"(address));
-        return address;
+        return Startup::linkerAddress<Symbol>();
     }
 
     constexpr std::uint32_t alignUp(std::uint32_t a) { return (a + 0x1FU) & ~0x1FU; }
@@ -147,11 +147,14 @@ namespace Kvasir { namespace Mpu {
         inline static std::uint8_t regions_{};
 
         static void preEnableRuntimeInit() {
-            using Kvasir::Register::apply;
-            using Kvasir::Register::write;
+            using namespace Kvasir::Register;
             asm volatile("dmb" ::: "memory");
-            apply(write(Regs::MPU_CTRL::FULLREGISTER, 0U));
-            apply(write(Regs::MPU_MAIR0::FULLREGISTER, kMair0Attr0));
+            apply(
+              clear(Regs::MPU_CTRL::enable, Regs::MPU_CTRL::hfnmiena, Regs::MPU_CTRL::privdefena));
+            apply(write(Regs::MPU_MAIR0::attr0, value<std::uint32_t, kMair0Attr0>()),
+                  write(Regs::MPU_MAIR0::attr1, value<std::uint32_t, 0U>()),
+                  write(Regs::MPU_MAIR0::attr2, value<std::uint32_t, 0U>()),
+                  write(Regs::MPU_MAIR0::attr3, value<std::uint32_t, 0U>()));
             auto const    layout = imageLayout();
             std::uint32_t n      = 0;
             for(auto const& r : layout) {
@@ -160,16 +163,16 @@ namespace Kvasir { namespace Mpu {
                     continue;
                 }
                 if(r.begin == r.end) { continue; }
-                auto const w = encode(r);
-                apply(write(Regs::MPU_RNR::FULLREGISTER, n));
+                auto const w = encode(r);   // every field of both: whole-word stores
+                apply(write(Regs::MPU_RNR::region, n));
                 apply(write(Regs::MPU_RBAR::FULLREGISTER, w.rbar));
                 apply(write(Regs::MPU_RLAR::FULLREGISTER, w.rlar));
                 ++n;
             }
             regions_ = static_cast<std::uint8_t>(n);
             for(; n < 8U; ++n) {
-                apply(write(Regs::MPU_RNR::FULLREGISTER, n));
-                apply(write(Regs::MPU_RLAR::FULLREGISTER, 0U));
+                apply(write(Regs::MPU_RNR::region, n));
+                apply(clear(Regs::MPU_RLAR::en));
             }
             follow();
         }
@@ -193,15 +196,15 @@ namespace Kvasir { namespace Mpu {
 
     private:
         static void follow() {
-            using Kvasir::Register::apply;
-            using Kvasir::Register::read;
-            using Kvasir::Register::write;
+            using namespace Kvasir::Register;
             bool const want = !Kvasir::Core::Debug::isDebuggerConnected();
             bool const is   = apply(read(Regs::MPU_CTRL::enable)) != 0U;
             if(want == is) { return; }
             asm volatile("dmb" ::: "memory");
-            // PRIVDEFENA: the default map behind the regions; ENABLE.
-            apply(write(Regs::MPU_CTRL::FULLREGISTER, want ? 0b101U : 0b100U));
+            // PRIVDEFENA: the default map behind the regions; HFNMIENA off; ENABLE as wanted.
+            apply(set(Regs::MPU_CTRL::privdefena),
+                  clear(Regs::MPU_CTRL::hfnmiena),
+                  write(Regs::MPU_CTRL::enable, want ? 1U : 0U));
             asm volatile("dsb\n isb" ::: "memory");
         }
     };

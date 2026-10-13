@@ -3,6 +3,7 @@
 #include "core/core.hpp"
 #include "kvasir/Common/Core.hpp"
 #include "kvasir/StartUp/LinkerSymbols.hpp"
+#include "peripherals/ROSC.hpp"
 #include "picobin.hpp"
 #include "rp_common/Multicore.hpp"
 #include "rp_common/bootrom_functions.hpp"
@@ -22,9 +23,9 @@ namespace Kvasir { namespace Startup {
             // VTOR at this image's own table. The bootrom points it where it found the image:
             // for a flash image that is the table, but for a RAM image packaged in flash (a
             // load map and no VECTOR_TABLE item: `<product>_release_ram_only_packaged.uf2`) it
-            // is the flash copy -- every exception vector then comes through XIP, and
-            // isFlashBinary() calls the image FLASH. The shipped image already runs with VTOR
-            // here (its decryption bootloader sets it), so for it this changes nothing.
+            // is the flash copy -- every exception vector then comes through XIP. The shipped
+            // image already runs with VTOR here (its decryption bootloader sets it), so for it
+            // this changes nothing.
             // VTOR = 0xE000ED08, TBLOFF bits [31:7] (Armv8-M ARM DDI0553B.y D1.2.272, RP2350
             // data sheet Table 202). The table has to be naturally aligned (B3.30, RVDPD): 68
             // entries -> 512 bytes; it is the first thing at ORIGIN(flash) / ORIGIN(ram).
@@ -48,13 +49,20 @@ namespace Kvasir { namespace Startup {
             // a watchdog reboot leaves CTRL.ENABLE set and a later flash download reloads the counter. Not valid
             // under TBYB (5.1.17), where the watchdog is the boot ROM's; picobin.hpp ImageDef never sets TBYB.
             apply(clear(Kvasir::Peripheral::WATCHDOG::Registers<>::CTRL::enable));
+            // Its tick running from here on, so any watchdog reset of this run keeps SRAM - also one this image
+            // does not make itself (the boot ROM's reboot(), a debugger's): WatchdogTick.hpp.
+            Kvasir::detail::keepWatchdogTickRunning();
 
             using PPB_S = Kvasir::Peripheral::PPB::Registers<0>;
 
-            //enable FPU and RCP coprocessor
+            // enable the FPU (cp10, cp11), the RCP (cp7) and the double-precision coprocessor (cp4: the DCP of the
+            // current security state, RP2350 datasheet 3.6.2, md l.4715; CPACR.CP4 bits 9:8, l.9704), which
+            // dcp_double.S puts behind the runtime's double functions; a coprocessor is enabled in CPACR before any
+            // access from Secure code (3.6, l.4562)
             apply(PPB_S::CPACR::overrideDefaults(write(PPB_S::CPACR::cp11, Register::value<3>()),
                                                  write(PPB_S::CPACR::cp10, Register::value<3>()),
-                                                 write(PPB_S::CPACR::cp7, Register::value<3>())));
+                                                 write(PPB_S::CPACR::cp7, Register::value<3>()),
+                                                 write(PPB_S::CPACR::cp4, Register::value<3>())));
             asm volatile("dsb\n isb" ::: "memory");
 
             // The RCP's salt, if nothing has written it: the boot ROM seeds it on its boot path,
@@ -69,8 +77,10 @@ namespace Kvasir { namespace Startup {
                 std::uint32_t status{};
                 asm volatile("mrc p7, #1, %0, c0, c0, #0" : "=r"(status));
                 if(status == 0x00C3'00C3U) {
-                    auto const bit = []() {
-                        return *reinterpret_cast<std::uint32_t const volatile*>(0x400E'8020U) & 1U;
+                    auto const bit = []() -> std::uint32_t {
+                        using namespace Kvasir::Register;
+                        return get<0>(
+                          apply(read(Kvasir::Peripheral::ROSC::Registers<>::RANDOMBIT::randombit)));
                     };
                     std::uint32_t lo{};
                     std::uint32_t hi{};
@@ -199,12 +209,13 @@ namespace Kvasir { namespace Startup {
     // RCP) enabled in CPACR; the FPU is off, and a hard-float build touches it in its first
     // frame. SecondaryCore's trampoline ORs this mask into CPACR before any compiled code
     // runs. cp7 is kept in the mask so a ROM call from core 1 (which uses RCP instructions)
-    // keeps working even if the trampoline ever wrote instead of ORed. Everything else in
+    // keeps working even if the trampoline ever wrote instead of ORed; cp4 is core 1's own DCP
+    // (each core has one, RP2350 datasheet 3.6.2), used by every double operation. Everything else in
     // FirstInitStep above (resets, PSM, watchdog select) is chip-wide and core 0's job.
     template<typename... Ts>
     struct SecondaryCoreInit<Tag::User, Ts...> {
         static constexpr std::uint32_t cpacrEnable
-          = Core::SecondaryCoreTraits::cpacrEnable | (3U << 14U);   // + cp7
+          = Core::SecondaryCoreTraits::cpacrEnable | (3U << 14U) | (3U << 8U);   // + cp7, cp4
 
         // The counterpart of the EXTEXCLALL write in FirstInitStep: without it core 1's
         // exclusives use its local monitor only and no lock in the system holds.

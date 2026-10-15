@@ -45,10 +45,6 @@ namespace Kvasir { namespace Startup {
             // 531); it is the one FRCE_OFF bit erratum RP2350-E19 allows to be set.
             Multicore::resetCore1();
 
-            // Watchdog off until the image arms it: only a chip-level reset resets it (RP2350 datasheet 12.9.1), so
-            // a watchdog reboot leaves CTRL.ENABLE set and a later flash download reloads the counter. Not valid
-            // under TBYB (5.1.17), where the watchdog is the boot ROM's; picobin.hpp ImageDef never sets TBYB.
-            apply(clear(Kvasir::Peripheral::WATCHDOG::Registers<>::CTRL::enable));
             // Its tick running from here on, so any watchdog reset of this run keeps SRAM - also one this image
             // does not make itself (the boot ROM's reboot(), a debugger's): WatchdogTick.hpp.
             Kvasir::detail::keepWatchdogTickRunning();
@@ -90,6 +86,16 @@ namespace Kvasir { namespace Startup {
                     }
                     asm volatile("mcrr p7, #8, %0, %1, c0" : : "r"(lo), "r"(hi) : "memory");
                 }
+            }
+
+            // Watchdog off until the image arms it: only a chip-level reset resets it (RP2350 datasheet 12.9.1), so
+            // a watchdog reboot leaves CTRL.ENABLE set and a later flash download reloads the counter. Not on a
+            // TBYB trial (5.1.17): an image launched on trial runs under the boot ROM's watchdog (16.7 s) until it
+            // buys itself, and that watchdog is what turns a hang before the image's own watchdog is armed into the
+            // reset that boots the other A/B partition. Its Watchdog's periphery init takes over from there. Here,
+            // below the salt and CPACR.CP7: bootInfo() is a boot ROM call, and those run RCP canary checks.
+            if(!Kvasir::Bootrom::bootInfo().trialBoot()) {
+                apply(clear(Kvasir::Peripheral::WATCHDOG::Registers<>::CTRL::enable));
             }
 
 #if defined(KVASIR_MULTICORE) && KVASIR_MULTICORE

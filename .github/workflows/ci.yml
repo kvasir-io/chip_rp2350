@@ -1,0 +1,44 @@
+name: CI
+
+# picobin: the host tests of the picobin block builder (tests/picobin/CMakeLists.txt): most checks are static_asserts,
+# so building is the test, and bad/*_fail.cpp must fail to compile with the message they name. A lone checkout of this
+# repository is all they need: picobin.hpp uses only the standard library.
+# conformance: the chip's conformance tree - the RP chips' one tree in the chip_rp_common submodule
+# (src/chip/rp_common/tests/conformance), configured for this chip, both parts -, Kvasir_SDK package-conformance.yml.
+# bench-chip-tool: the RP2350 bench commands' decoders (tools/kvasir_bench_chip.py, loaded by Kvasir_SDK's
+# kvasir_bench.py) on register words read from boards, with the field tables from chip.svd; no board, the Python
+# standard library only.
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
+    workflow_dispatch:
+
+jobs:
+    picobin:
+        uses: kvasir-io/Kvasir_SDK/.github/workflows/package-host-tests.yml@master
+        with: {source-dir: tests/picobin}
+
+    conformance:
+        uses: kvasir-io/Kvasir_SDK/.github/workflows/package-conformance.yml@master
+        with:
+            variants: '["RP2350A","RP2350B"]'
+            source-dir: src/chip/rp_common/tests/conformance
+            cmake-args: -DCONFORMANCE_CHIP=rp2350
+
+    bench-chip-tool:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+
+            - name: Bench chip tool test
+              run: python3 -B tools/test_kvasir_bench_chip.py -v
+
+    # the include layering of this repository against Kvasir_SDK tools/layers.toml (any finding fails)
+    layers:
+        uses: kvasir-io/Kvasir_SDK/.github/workflows/package-layers.yml@master

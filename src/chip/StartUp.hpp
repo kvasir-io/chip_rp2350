@@ -1,209 +1,33 @@
 #pragma once
-#include "chip/rp_common/ResetMap.hpp"
+#include "BootTraits.hpp"
 #include "core/core.hpp"
-#include "kvasir/Common/Core.hpp"
-#include "kvasir/StartUp/LinkerSymbols.hpp"
-#include "peripherals/ROSC.hpp"
+#include "kvasir/Port/Hooks.hpp"
+#include "kvasir/Port/LinkerSymbols.hpp"
+#include "kvasir/Util/attributes.hpp"
+#include "peripherals/PPB.hpp"
 #include "picobin.hpp"
-#include "rp_common/Multicore.hpp"
-#include "rp_common/bootrom_functions.hpp"
+#include "rp_common/AnnouncedResetClock.hpp"
+#include "rp_common/BootSequence.hpp"
+#include "rp_common/Rom.hpp"
 
 #include <array>
 #include <cstdint>
 
 namespace Kvasir { namespace Startup {
-    [[gnu::used, gnu::section(".after_vectors")]] static constexpr auto ImageDef
+    // inline: one block per image whichever TUs include this header (a second copy would be a second, silent block in
+    // the loop); KVASIR_SECTION keeps the section under gcc's LTO (kvasir/Util/attributes.hpp)
+    [[gnu::used, KVASIR_SECTION(".after_vectors")]] inline constexpr auto imageDef
       = Picobin::BlockLoop<Picobin::Block<Picobin::ArmSecure>>::words;
 
+    // RP boot sequence (rp_common/BootSequence.hpp) over the RP2350's steps (chip/BootTraits.hpp)
     template<typename... Ts>
     struct FirstInitStep<Tag::User, Ts...> {
-        void operator()() {
-            Core::startup();
-
-            // VTOR at this image's own table. The bootrom points it where it found the image:
-            // for a flash image that is the table, but for a RAM image packaged in flash (a
-            // load map and no VECTOR_TABLE item: `<product>_release_ram_only_packaged.uf2`) it
-            // is the flash copy -- every exception vector then comes through XIP. The shipped
-            // image already runs with VTOR here (its decryption bootloader sets it), so for it
-            // this changes nothing.
-            // VTOR = 0xE000ED08, TBLOFF bits [31:7] (Armv8-M ARM DDI0553B.y D1.2.272, RP2350
-            // data sheet Table 202). The table has to be naturally aligned (B3.30, RVDPD): 68
-            // entries -> 512 bytes; it is the first thing at ORIGIN(flash) / ORIGIN(ram).
-            apply(write(Kvasir::Peripheral::SCB::Registers<>::VTOR::FULLREGISTER,
-                        static_cast<std::uint32_t>(
-                          reinterpret_cast<std::uintptr_t>(&_LINKER_vectors_start_))));
-            asm volatile("dsb\n isb" ::: "memory");
-
-            // Core 1 back into the bootrom's holding pen, before this image touches RAM. A
-            // debugger's flash-and-reset restarts core 0 only: a core 1 the image before had
-            // launched keeps running that image's code -- out of RAM this one is about to
-            // fill with its own data, and from there anywhere. Seen:
-            // a firmware that never starts core 1, flashed over one that had it spinning in a
-            // RAM loop, got a sanitizer report from a function no path could have reached with
-            // that state, log lines with absurd values on core 1's log ring, and core 1 found
-            // in lockup (PC 0xEFFFFFFE) afterwards. PSM FRCE_OFF.PROC1 (data sheet, table
-            // 531); it is the one FRCE_OFF bit erratum RP2350-E19 allows to be set.
-            Multicore::resetCore1();
-
-            // Its tick running from here on, so any watchdog reset of this run keeps SRAM - also one this image
-            // does not make itself (the boot ROM's reboot(), a debugger's): WatchdogTick.hpp.
-            Kvasir::detail::keepWatchdogTickRunning();
-
-            using PPB_S = Kvasir::Peripheral::PPB::Registers<0>;
-
-            // enable the FPU (cp10, cp11), the RCP (cp7) and the double-precision coprocessor (cp4: the DCP of the
-            // current security state, RP2350 datasheet 3.6.2, md l.4715; CPACR.CP4 bits 9:8, l.9704), which
-            // dcp_double.S puts behind the runtime's double functions; a coprocessor is enabled in CPACR before any
-            // access from Secure code (3.6, l.4562)
-            apply(PPB_S::CPACR::overrideDefaults(write(PPB_S::CPACR::cp11, Register::value<3>()),
-                                                 write(PPB_S::CPACR::cp10, Register::value<3>()),
-                                                 write(PPB_S::CPACR::cp7, Register::value<3>()),
-                                                 write(PPB_S::CPACR::cp4, Register::value<3>())));
-            asm volatile("dsb\n isb" ::: "memory");
-
-            // The RCP's salt, if nothing has written it: the boot ROM seeds it on its boot path,
-            // which an image a debugger started in RAM never went through. With the salt invalid
-            // any RCP instruction but canary_status and a salt write is an RCP fault (NMI), and
-            // the boot ROM's API functions run RCP canary checks (RP2350 datasheet 3.6.3.1,
-            // md l.5075-5081; 3.2.1, l.3799). Status 0xa500a500 valid / 0x00c300c3 invalid
-            // (l.5331); writing a valid salt is a fault too (l.5083). Core 0's salt only. The
-            // value: 64 ROSC RANDOMBIT reads (0x400e8000 + 0x20, md l.1552, l.28148), not a
-            // secret. Encodings as pico-sdk's hardware/rcp.h (rcp_canary_status, rcp_salt_core0).
-            {
-                std::uint32_t status{};
-                asm volatile("mrc p7, #1, %0, c0, c0, #0" : "=r"(status));
-                if(status == 0x00C3'00C3U) {
-                    auto const bit = []() -> std::uint32_t {
-                        using namespace Kvasir::Register;
-                        return get<0>(
-                          apply(read(Kvasir::Peripheral::ROSC::Registers<>::RANDOMBIT::randombit)));
-                    };
-                    std::uint32_t lo{};
-                    std::uint32_t hi{};
-                    for(int i = 0; i != 32; ++i) {
-                        lo = (lo << 1) | bit();
-                        hi = (hi << 1) | bit();
-                    }
-                    asm volatile("mcrr p7, #8, %0, %1, c0" : : "r"(lo), "r"(hi) : "memory");
-                }
-            }
-
-            // Watchdog off until the image arms it: only a chip-level reset resets it (RP2350 datasheet 12.9.1), so
-            // a watchdog reboot leaves CTRL.ENABLE set and a later flash download reloads the counter. Not on a
-            // TBYB trial (5.1.17): an image launched on trial runs under the boot ROM's watchdog (16.7 s) until it
-            // buys itself, and that watchdog is what turns a hang before the image's own watchdog is armed into the
-            // reset that boots the other A/B partition. Its Watchdog's periphery init takes over from there. Here,
-            // below the salt and CPACR.CP7: bootInfo() is a boot ROM call, and those run RCP canary checks.
-            if(!Kvasir::Bootrom::bootInfo().trialBoot()) {
-                apply(clear(Kvasir::Peripheral::WATCHDOG::Registers<>::CTRL::enable));
-            }
-
-#if defined(KVASIR_MULTICORE) && KVASIR_MULTICORE
-            // Exclusive accesses (ldrex/strex, i.e. every std::atomic RMW and every
-            // Atomic::Spinlock) only reach the bus fabric's global monitor for memory the
-            // core treats as shareable, and by default nothing is. Without this bit the
-            // two cores' exclusives never arbitrate: both strex succeed, and a lock holds
-            // or fails depending on which core is a cycle ahead. EXTEXCLALL sends every
-            // exclusive to the global monitor. Per core: SecondaryCoreInit sets it on
-            // core 1. (pico-sdk: spinlock_set_extexclall.)
-            apply(set(PPB_S::ACTLR::extexclall));
-            asm volatile("dsb\n isb" ::: "memory");
-#endif
-
-            using Reset = Kvasir::Peripheral::RESETS::Registers<>::RESET;
-            apply(set(Reset::usbctrl),
-                  set(Reset::uart1),
-                  set(Reset::uart0),
-                  set(Reset::trng),
-                  set(Reset::timer1),
-                  set(Reset::timer0),
-                  set(Reset::tbman),
-                  clear(Reset::sysinfo),
-                  clear(Reset::syscfg),
-                  set(Reset::spi1),
-                  set(Reset::spi0),
-                  set(Reset::sha256),
-                  set(Reset::pwm),
-                  set(Reset::pll_usb),
-                  clear(Reset::pll_sys),
-                  set(Reset::pio2),
-                  set(Reset::pio1),
-                  set(Reset::pio0),
-                  clear(Reset::pads_qspi),
-                  set(Reset::pads_bank0),
-                  set(Reset::jtag),
-                  clear(Reset::io_qspi),
-                  set(Reset::io_bank0),
-                  set(Reset::i2c1),
-                  set(Reset::i2c0),
-                  set(Reset::hstx),
-                  set(Reset::dma),
-                  set(Reset::busctrl),
-                  set(Reset::adc));
-
-            using PSM_WDSEL = Kvasir::Peripheral::PSM::Registers<>::WDSEL;
-            apply(set(PSM_WDSEL::proc1),
-                  set(PSM_WDSEL::proc0),
-                  set(PSM_WDSEL::accessctrl),
-                  set(PSM_WDSEL::sio),
-                  set(PSM_WDSEL::xip),
-                  set(PSM_WDSEL::sram9),
-                  set(PSM_WDSEL::sram8),
-                  set(PSM_WDSEL::sram7),
-                  set(PSM_WDSEL::sram6),
-                  set(PSM_WDSEL::sram5),
-                  set(PSM_WDSEL::sram4),
-                  set(PSM_WDSEL::sram3),
-                  set(PSM_WDSEL::sram2),
-                  set(PSM_WDSEL::sram1),
-                  set(PSM_WDSEL::sram0),
-                  set(PSM_WDSEL::bootram),
-                  set(PSM_WDSEL::rom),
-                  set(PSM_WDSEL::busfabric),
-                  set(PSM_WDSEL::ready),
-                  set(PSM_WDSEL::clocks),
-                  set(PSM_WDSEL::resets),
-                  set(PSM_WDSEL::xosc),
-                  set(PSM_WDSEL::rosc),
-                  set(PSM_WDSEL::otp),
-                  set(PSM_WDSEL::proc_cold));
-
-            using WDSEL = Kvasir::Peripheral::RESETS::Registers<>::WDSEL;
-            apply(set(WDSEL::usbctrl),
-                  set(WDSEL::uart1),
-                  set(WDSEL::uart0),
-                  set(WDSEL::trng),
-                  set(WDSEL::timer1),
-                  set(WDSEL::timer0),
-                  set(WDSEL::tbman),
-                  set(WDSEL::sysinfo),
-                  set(WDSEL::syscfg),
-                  set(WDSEL::spi1),
-                  set(WDSEL::spi0),
-                  set(WDSEL::sha256),
-                  set(WDSEL::pwm),
-                  set(WDSEL::pll_usb),
-                  set(WDSEL::pll_sys),
-                  set(WDSEL::pio2),
-                  set(WDSEL::pio1),
-                  set(WDSEL::pio0),
-                  set(WDSEL::pads_qspi),
-                  set(WDSEL::pads_bank0),
-                  set(WDSEL::jtag),
-                  set(WDSEL::io_qspi),
-                  set(WDSEL::io_bank0),
-                  set(WDSEL::i2c1),
-                  set(WDSEL::i2c0),
-                  set(WDSEL::hstx),
-                  set(WDSEL::dma),
-                  set(WDSEL::busctrl),
-                  set(WDSEL::adc));
-        }
+        void operator()() { Rp::firstInit<Rp::BootTraits>(); }
     };
 
 }}   // namespace Kvasir::Startup
 
-#if defined(KVASIR_MULTICORE) && KVASIR_MULTICORE && !(defined(KVASIR_RAM_ONLY) && KVASIR_RAM_ONLY)
+#if KVASIR_RP_CORE_RESET_GUARDED
     // Multicore flash images only (armed by SecondaryCoreInit::armCoreResetGuard); included below FirstInitStep so
     // its source lines, which a sanitizer records, do not move
     #include "CoreResetGuard.hpp"
@@ -219,35 +43,26 @@ namespace Kvasir { namespace Startup {
     // (each core has one, RP2350 datasheet 3.6.2), used by every double operation. Everything else in
     // FirstInitStep above (resets, PSM, watchdog select) is chip-wide and core 0's job.
     template<typename... Ts>
-    struct SecondaryCoreInit<Tag::User, Ts...> {
-        static constexpr std::uint32_t cpacrEnable
-          = Core::SecondaryCoreTraits::cpacrEnable | (3U << 14U) | (3U << 8U);   // + cp7, cp4
-
-        // The counterpart of the EXTEXCLALL write in FirstInitStep: without it core 1's
-        // exclusives use its local monitor only and no lock in the system holds.
-        void operator()() {
-            using PPB_S = Kvasir::Peripheral::PPB::Registers<0>;
-            apply(set(PPB_S::ACTLR::extexclall));
-            asm volatile("dsb\n isb" ::: "memory");
-        }
-
-        // From core 0: the FIFO handshake with the bootrom's holding pen, and the PSM reset
-        // that puts core 1 back into it.
-        [[nodiscard]] static bool launch(std::uint32_t entry,
-                                         std::uint32_t sp,
-                                         std::uint32_t vtor) {
-            return Multicore::launchCore1(entry, sp, vtor);
-        }
-
-        static void reset() { Multicore::resetCore1(); }
-
-        // Called by SecondaryCore's runtimeInit before core 1 starts, unless its list holds
-        // Kvasir::Startup::NoCoreResetGuard (CoreResetGuard.hpp). No-op in a RAM image.
-        static void armCoreResetGuard() {
-#if defined(KVASIR_MULTICORE) && KVASIR_MULTICORE && !(defined(KVASIR_RAM_ONLY) && KVASIR_RAM_ONLY)
-            Kvasir::CoreResetGuard::runtimeInit();
+    struct SecondaryCoreInit<Tag::User, Ts...>
+      : Rp::SecondaryCoreInitBase<
+#if KVASIR_RP_CORE_RESET_GUARDED
+          Kvasir::CoreResetGuard
+#else
+          Rp::NoGuard
 #endif
-        }
+          > {
+        // Core 1's CPACR, written by the SDK's launch trampoline: the core's FPU fields (CP10/CP11, as core 0's
+        // Startup::Core::startup() opens them) and the chip's own coprocessors, as BootTraits::enableCoprocessors().
+        using CPACR                                 = Kvasir::Peripheral::PPB::Registers<0>::CPACR;
+        static constexpr std::uint32_t coprocessors = CPACR::cp7.mask | CPACR::cp4.mask;
+        static_assert(coprocessors == ((3U << 14U) | (3U << 8U)),
+                      "CPACR.CP7 bits 15:14, CP4 bits 9:8");
+        static constexpr std::uint32_t cpacrEnable
+          = Core::SecondaryCoreTraits::cpacrEnable | coprocessors;
+
+        // The counterpart of FirstInitStep's EXTEXCLALL write: without it core 1's exclusives use its local monitor
+        // only and no lock in the system holds.
+        void operator()() { Rp::BootTraits::routeExclusivesGlobally(); }
     };
 
     // The stack guard's per-boot value: the boot ROM's BOOT_RANDOM, "a 128-bit random number
@@ -257,13 +72,20 @@ namespace Kvasir { namespace Startup {
     template<typename... Ts>
     struct StackGuardEntropy<Tag::User, Ts...> {
         std::uint32_t operator()() const {
-            constexpr std::uint32_t      BootRandom = 0x0010;
+            constexpr std::uint32_t      bootRandom = 0x0010;
             std::array<std::uint32_t, 5> buffer{};
-            auto const words = detail::get_sys_info(buffer.data(), buffer.size(), BootRandom);
-            if(words < 5 || (buffer[0] & BootRandom) == 0) { return 0xdeadc0deU; }
+            auto const words = RomFunctions::getSysInfo(buffer.data(), buffer.size(), bootRandom);
+            if(words < 5 || (buffer[0] & bootRandom) == 0) { return 0xdeadc0deU; }
             return buffer[1] ^ buffer[2] ^ buffer[3] ^ buffer[4];
         }
     };
 }}   // namespace Kvasir::Startup
 
-#include "kvasir/StartUp/StartUp.hpp"
+// An address no bus slave answers at, for Kvasir::Fault::Inject (kvasir/Runtime/FaultInject.hpp): the rough decode on
+// bits 31:28 has no segment 0xF (RP2350 datasheet 2.2 Table 8: ROM 0x0, XIP 0x1, SRAM 0x2, APB 0x4, AHB 0x5, SIO
+// 0xd, M33 private 0xe), and "unmapped address ranges raise a bus error when accessed" (2.2): a precise BusFault
+// for a load (PRECISERR, BFAR = 0xF0000000).
+template<>
+struct Kvasir::Port::UnmappedAddress<Kvasir::Tag::User> {
+    static constexpr std::uintptr_t value = 0xF000'0000U;
+};

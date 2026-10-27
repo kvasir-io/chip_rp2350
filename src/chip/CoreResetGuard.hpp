@@ -12,24 +12,32 @@
 //
 // Not covered: the RCP salt fault of a core-0 reset while core 1 runs (seeded before the vector); debugger resets/
 // downloads (pre-reset commands clear SCRATCH4); Kvasir's own reboots (the ROM's reboot); power-on/brown-out/RUN-pin
-// resets. PM::reset_cause() is unchanged.
+// resets. PM::resetCause() is unchanged.
 
+#include "kvasir/Port/LinkerSymbols.hpp"
 #include "kvasir/Register/Register.hpp"
-#include "kvasir/StartUp/LinkerSymbols.hpp"
 #include "kvasir/Util/attributes.hpp"
-#include "peripherals/WATCHDOG.hpp"
+#include "peripherals/DMA.hpp"
+#include "peripherals/PSM.hpp"
+#include "peripherals/RESETS.hpp"
+#include "rp_common/RegisterAlias.hpp"
+#include "rp_common/WatchdogBoot.hpp"
 
 #include <cstdint>
 
 namespace Kvasir {
 struct CoreResetGuard {
-    static constexpr std::uint32_t BootMagic = 0xB007'C0D3U;   // datasheet 5.2.4
+    static constexpr std::uint32_t bootMagic = Rp::WatchdogBoot::magic;   // datasheet 5.2.4
+
+    using ResetDone = Kvasir::Peripheral::RESETS::Registers<>::RESET_DONE;
+    using ChanAbort = Kvasir::Peripheral::DMA::Registers<>::CHAN_ABORT;
+    using FrceOff   = Kvasir::Peripheral::PSM::Registers<>::FRCE_OFF;
 
     // The routine: called by the ROM with the stack pointer from SCRATCH6, returns to it. Registers r0-r3 only (the
-    // ROM calls it as a function), every literal in its own pool (.ltorg) in RAM with it. Addresses: RESETS 0x40020000
-    // (RESET_DONE +0x08, bit 2 DMA; 7.5.3), DMA 0x50000000 (CHAN_ABORT +0x464, bits 15:0, high until in-flight
-    // transfers are flushed; 12.6.10 Table 1182), PSM 0x40018000 (FRCE_OFF +0x04, bit 24 PROC1, 7.4.4 Table 531),
-    // atomic set / clear aliases +0x2000 / +0x3000 (2.1.3).
+    // ROM calls it as a function), every literal in its own pool (.ltorg) in RAM with it. Every address and bit is an
+    // operand from the generated registers: RESETS RESET_DONE.DMA (7.5.3), DMA CHAN_ABORT (bits 15:0, high until
+    // in-flight transfers are flushed; 12.6.10 Table 1182), PSM FRCE_OFF.PROC1 (7.4.4 Table 531) through the atomic
+    // set / clear aliases (2.1.3, rp_common/RegisterAlias.hpp).
     [[KVASIR_RAM_FUNC_ATTRIBUTES,
       gnu::naked,
       gnu::used]] static void
@@ -39,12 +47,12 @@ struct CoreResetGuard {
           ".syntax unified\n"
           // DMA: every channel aborted, if the block is out of reset (an access to a block held in reset
           // is not answered)
-          "  ldr  r0, =0x40020008\n"
+          "  ldr  r0, =%c[resetDone]\n"
           "  ldr  r1, [r0]\n"
-          "  tst  r1, #4\n"
+          "  tst  r1, %[dmaDone]\n"
           "  beq  12f\n"
-          "  ldr  r0, =0x50000464\n"
-          "  movw r1, #0xFFFF\n"
+          "  ldr  r0, =%c[chanAbort]\n"
+          "  movw r1, %[allChannels]\n"
           "  str  r1, [r0]\n"
           "11:\n"
           "  ldr  r1, [r0]\n"
@@ -52,32 +60,35 @@ struct CoreResetGuard {
           "  bne  11b\n"
           "12:\n"
           // core 1: FRCE_OFF.PROC1 set, read back set, released
-          "  ldr  r0, =0x4001A004\n"
-          "  mov  r1, #0x01000000\n"
+          "  ldr  r0, =%c[frceOffSet]\n"
+          "  mov  r1, %[proc1]\n"
           "  str  r1, [r0]\n"
-          "  ldr  r2, =0x40018004\n"
+          "  ldr  r2, =%c[frceOff]\n"
           "13:\n"
           "  ldr  r3, [r2]\n"
           "  tst  r3, r1\n"
           "  beq  13b\n"
-          "  ldr  r0, =0x4001B004\n"
+          "  ldr  r0, =%c[frceOffClr]\n"
           "  str  r1, [r0]\n"
           "  bx   lr\n"
-          ".ltorg\n");
+          ".ltorg\n" ::[resetDone] "i"(ResetDone::Addr::value),
+          [dmaDone] "i"(ResetDone::dma.mask),
+          [chanAbort] "i"(ChanAbort::Addr::value),
+          [allChannels] "i"(ChanAbort::chan_abort.mask),
+          [frceOff] "i"(FrceOff::Addr::value),
+          [frceOffSet] "i"(FrceOff::Addr::value + Rp::aliasSet),
+          [frceOffClr] "i"(FrceOff::Addr::value + Rp::aliasClr),
+          [proc1] "i"(FrceOff::proc1.mask));
     }
 
-    // After initMemory (the Startup list's runtimeInit): the routine is in RAM with .data. Armed with SCRATCH4 last,
-    // so a reset in between finds no half-written vector (the ROM checks both magic words). The stack: the image's
-    // initial one - nothing on it outlives a reset.
+    // After initMemory (the Startup list's runtimeInit): the routine is in RAM with .data. Armed through
+    // Rp::WatchdogBoot::arm (SCRATCH4 last). The stack: the image's initial one - nothing on it outlives a reset.
     static void runtimeInit() {
-        using WD      = Kvasir::Peripheral::WATCHDOG::Registers<>;
         auto const at = reinterpret_cast<std::uint32_t>(&entry) | 1U;   // Thumb
-        apply(write(WD::SCRATCH7::FULLREGISTER, at));
-        apply(
-          write(WD::SCRATCH6::FULLREGISTER,
-                static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(&_LINKER_stack_end_))));
-        apply(write(WD::SCRATCH5::FULLREGISTER, at ^ (0U - BootMagic)));
-        apply(write(WD::SCRATCH4::FULLREGISTER, Register::value<BootMagic>()));
+        Rp::WatchdogBoot::arm(at, static_cast<std::uint32_t>(Startup::PrimaryStackTop::value()));
     }
+
+    // The watchdog boot vector is set: a reset of core 0 alone runs the routine.
+    [[nodiscard]] static bool armed() { return Rp::WatchdogBoot::armed(); }
 };
 }   // namespace Kvasir

@@ -1,4 +1,5 @@
-/* Linker script for RP2350 with 4MB Flash */
+/* Linker script for RP2350 with 4MB Flash. The RAM is SRAM0-9, the datasheet's single 520 kB memory (RP2350 datasheet
+   4.2): the image uses all of it (also chip_ram_only.ld). */
 
 MEMORY{
     flash  (xr ) : ORIGIN = 0x10000000, LENGTH = 4M

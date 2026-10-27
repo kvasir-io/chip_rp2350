@@ -1,7 +1,23 @@
 """RP2350 commands for Kvasir_SDK/tools/kvasir_bench.py: `kvasir_bench.py chip B T <name>`."""
+import re
 import time
+from pathlib import Path
 
 QMI_WIDTHS = {0: "single", 1: "dual", 2: "quad"}
+
+CHIP_CMAKE = Path(__file__).resolve().parent.parent / "cmake" / "chip.cmake"
+
+
+def jlink_words(variable: str, text: str | None = None) -> list[tuple[int, int]]:
+    """The `w4 <address> <value>` lines of one of chip.cmake's J-Link lists (`set(<variable> "w4 A V" ...)`), as
+    (address, value): the words the printer writes, so `qmi --recover` writes the same ones."""
+    text = CHIP_CMAKE.read_text() if text is None else text
+    m = re.search(r"^set\(" + re.escape(variable) +
+                  r"((?:\s+\"w4 0x[0-9A-Fa-f]+ 0x[0-9A-Fa-f]+\")+)\)", text, re.M)
+    if not m:
+        raise ValueError(
+            f"{CHIP_CMAKE}: no set({variable} \"w4 <address> <value>\" ...)")
+    return [(int(a, 16), int(v, 16)) for a, v in re.findall(r"\"w4 (0x[0-9A-Fa-f]+) (0x[0-9A-Fa-f]+)\"", m.group(1))]
 
 
 def field(value: int, fields: dict[str, tuple[int, int]], name: str) -> int:
@@ -78,7 +94,8 @@ def qmi_state(direct_csr: int, dhcsr: int, f: dict) -> tuple[bool, list[str]]:
 
 def qmi_arguments(parser) -> None:
     parser.add_argument("--recover", action="store_true",
-                        help="reset every power domain but PROC_COLD through the watchdog")
+                        help="the printer's stall recovery: SCRATCH4 cleared, every power domain but PROC_COLD "
+                             "reset through the watchdog")
 
 
 def qmi(bench, args) -> None:
@@ -86,7 +103,9 @@ def qmi(bench, args) -> None:
     QMI with a memory-mapped transfer that never ends (DIRECT_CSR.BUSY, "set if a memory-mapped
     transfer is in progress", RP2350 datasheet 12.14 Table 1294): the boot ROM waits for it and the
     core locks up, every flash download fails. A core reset does not reset the QMI; a watchdog
-    reset with PSM.WDSEL covering XIP does."""
+    reset with PSM.WDSEL covering XIP does. `--recover` writes chip.cmake's `_chip_jlink_stall_recovery`
+    words, the ones the printer writes (WATCHDOG SCRATCH4 to 0 first: no CoreResetGuard boot vector
+    runs, its RAM routine may be gone; then PSM.WDSEL and WATCHDOG.CTRL.TRIGGER)."""
     qbase, qregs = bench.svd("QMI")
     _, (csr, dhcsr) = bench.read([qbase + qregs["DIRECT_CSR"][0], DHCSR])
     busy, lines = qmi_state(csr, dhcsr, qregs["DIRECT_CSR"][1])
@@ -96,21 +115,14 @@ def qmi(bench, args) -> None:
         if busy:
             print("  stuck: `--recover` resets the chip through the watchdog")
         return
-    pbase, pregs = bench.svd("PSM")
-    wbase, wregs = bench.svd("WATCHDOG")
-    wdsel_at, fields = pregs["WDSEL"]
-    domains = 0
-    for name, (lsb, width) in fields.items():
-        if name != "PROC_COLD":
-            domains |= ((1 << width) - 1) << lsb
-    bench.write([(pbase + wdsel_at, domains)])
-    lsb, _ = wregs["CTRL"][1]["TRIGGER"]
+    *setup, trigger = jlink_words("_chip_jlink_stall_recovery")
+    bench.write(setup)
     try:  # the chip resets under this write: its read-back may fail
-        bench.write([(wbase + wregs["CTRL"][0], 1 << lsb)])
+        bench.write([trigger])
     except Exception:
         pass
-    print(f"watchdog reset of every domain (PSM.WDSEL {domains:#010x}) triggered: the printer "
-          "reconnects; check again with `chip B T qmi`")
+    print("the stall recovery (" + ", ".join(f"{a:#010x} <- {v:#010x}" for a, v in setup + [trigger])
+          + ") triggered a watchdog reset: the printer reconnects; check again with `chip B T qmi`")
 
 
 def commands() -> dict:

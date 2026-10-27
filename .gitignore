@@ -1,2 +1,2 @@
-justfile
 __pycache__/
+tests/**/build*/

@@ -5,12 +5,13 @@
  */
 
 // RP2350 double-precision coprocessor (DCP, RP2350 datasheet 3.6.2) behind the compiler runtime's double functions.
-// From pico-sdk 2.3.1: src/rp2_common/hardware_dcp/include/hardware/dcp_instr.inc.S and dcp_canned.inc.S,
-// src/rp2_common/pico_double/double_aeabi_dcp.S, flattened (as chip_rp2040's divider.S): the SDK's config, its
-// non-runtime entry points (ddiv_fast, double2fix, ...) and the soft-float-ABI aliases left out.
+// Owned, trimmed from pico-sdk 2.3.1 (src/rp2_common/hardware_dcp/include/hardware/dcp_instr.inc.S and dcp_canned.inc.S,
+// src/rp2_common/pico_double/double_aeabi_dcp.S), as chip_rp2040's divider.S; no upstream sync. Left out: the SDK's
+// config, its non-runtime entry points (ddiv_fast, double2fix, ...), the soft-float-ABI aliases, and every
+// instruction macro and canned sequence no function below expands (the object's code is byte for byte the same).
 //
-// chip.cmake links each function in place of the runtime's with --wrap=<name>; __real_<name> stays the soft-float
-// one. Every entry checks the DCP's "engaged" flag first (PCMP, then bmi): when it interrupted a canned sequence, it
+// chip.cmake reads the `saving_func wrapper <name>` lines below and links each function in place of the runtime's
+// with --wrap=<name>; __real_<name> stays the soft-float one. A new function is one more such line, nothing else. Every entry checks the DCP's "engaged" flag first (PCMP, then bmi): when it interrupted a canned sequence, it
 // saves the six state words on the stack and restores them on return (RP2350 datasheet 3.6.2.4) - safe in any
 // interrupt without anything in the handlers. Coprocessor 4 must be enabled in CPACR (chip StartUp.hpp, both cores).
 
@@ -47,9 +48,6 @@ regular_func WRAPPER_FUNC_NAME(\x)
 double_section WRAPPER_FUNC_NAME(\func)
 .endm
 
-.macro INIT
- cdp p4,#0,c0,c0,c0,#0
-.endm
 .macro ADD0
  cdp p4,#0,c0,c0,c1,#0
 .endm
@@ -62,9 +60,6 @@ double_section WRAPPER_FUNC_NAME(\func)
 .macro SQR0
  cdp p4,#2,c0,c0,c1,#0
 .endm
-.macro NORM
- cdp p4,#8,c0,c0,c2,#0
-.endm
 .macro NRDF
  cdp p4,#8,c0,c0,c2,#1
 .endm
@@ -73,9 +68,6 @@ double_section WRAPPER_FUNC_NAME(\func)
 .endm
 .macro NTDC
  cdp p4,#8,c0,c0,c0,#2
-.endm
-.macro NRDC
- cdp p4,#8,c0,c0,c0,#3
 .endm
 .macro WXMD rl,rh
  mcrr p4,#0,\rl,\rh,c0
@@ -91,9 +83,6 @@ double_section WRAPPER_FUNC_NAME(\func)
 .endm
 .macro WYUP rl,rh
  mcrr p4,#1,\rl,\rh,c1
-.endm
-.macro WXYU rl,rh
- mcrr p4,#1,\rl,\rh,c2
 .endm
 .macro WXMS rl,rh
  mcrr p4,#2,\rl,\rh,c0
@@ -116,38 +105,8 @@ double_section WRAPPER_FUNC_NAME(\func)
 .macro WXDC rl,rh
  mcrr p4,#8,\rl,\rh,c0
 .endm
-.macro WXFC rl,rh
- mcrr p4,#9,\rl,\rh,c2
-.endm
-.macro WXFM rl,rh
- mcrr p4,#10,\rl,\rh,c0
-.endm
-.macro WXFD rl,rh
- mcrr p4,#11,\rl,\rh,c0
-.endm
-.macro WXFQ rl,rh
- mcrr p4,#12,\rl,\rh,c0
-.endm
-.macro RXVD rt
- mrc p4,#0,\rt,c0,c0,#0
-.endm
 .macro RCMP rt
  mrc p4,#0,\rt,c0,c0,#1
-.endm
-.macro RDFA rt
- mrc p4,#0,\rt,c0,c2,#0
-.endm
-.macro RDFS rt
- mrc p4,#0,\rt,c0,c2,#1
-.endm
-.macro RDFM rt
- mrc p4,#0,\rt,c0,c2,#2
-.endm
-.macro RDFD rt
- mrc p4,#0,\rt,c0,c2,#3
-.endm
-.macro RDFQ rt
- mrc p4,#0,\rt,c0,c2,#4
 .endm
 .macro RDFG rt
  mrc p4,#0,\rt,c0,c2,#5
@@ -158,12 +117,6 @@ double_section WRAPPER_FUNC_NAME(\func)
 .macro RDUC rt
  mrc p4,#0,\rt,c0,c3,#1
 .endm
-.macro RXMD rl,rh
- mrrc p4,#0,\rl,\rh,c8
-.endm
-.macro RYMD rl,rh
- mrrc p4,#0,\rl,\rh,c9
-.endm
 .macro REFD rl,rh
  mrrc p4,#0,\rl,\rh,c10
 .endm
@@ -172,9 +125,6 @@ double_section WRAPPER_FUNC_NAME(\func)
 .endm
 .macro RYMS rl,rh,s
  mrrc p4,#\s,\rl,\rh,c5
-.endm
-.macro RXYH rl,rh
- mrrc p4,#1,\rl,\rh,c1
 .endm
 .macro RYMR rl,rh
  mrrc p4,#2,\rl,\rh,c1
@@ -197,38 +147,8 @@ double_section WRAPPER_FUNC_NAME(\func)
 .macro RDDQ rl,rh
  mrrc p4,#9,\rl,\rh,c0
 .endm
-.macro RDDG rl,rh
- mrrc p4,#11,\rl,\rh,c0
-.endm
-.macro PXVD rt
- mrc2 p4,#0,\rt,c0,c0,#0
-.endm
 .macro PCMP rt
  mrc2 p4,#0,\rt,c0,c0,#1
-.endm
-.macro PDFA rt
- mrc2 p4,#0,\rt,c0,c2,#0
-.endm
-.macro PDFS rt
- mrc2 p4,#0,\rt,c0,c2,#1
-.endm
-.macro PDFM rt
- mrc2 p4,#0,\rt,c0,c2,#2
-.endm
-.macro PDFD rt
- mrc2 p4,#0,\rt,c0,c2,#3
-.endm
-.macro PDFQ rt
- mrc2 p4,#0,\rt,c0,c2,#4
-.endm
-.macro PDFG rt
- mrc2 p4,#0,\rt,c0,c2,#5
-.endm
-.macro PDIC rt
- mrc2 p4,#0,\rt,c0,c3,#0
-.endm
-.macro PDUC rt
- mrc2 p4,#0,\rt,c0,c3,#1
 .endm
 .macro PXMD rl,rh
  mrrc2 p4,#0,\rl,\rh,c8
@@ -236,174 +156,8 @@ double_section WRAPPER_FUNC_NAME(\func)
 .macro PYMD rl,rh
  mrrc2 p4,#0,\rl,\rh,c9
 .endm
-.macro PEFD rl,rh
- mrrc2 p4,#0,\rl,\rh,c10
-.endm
-.macro PXMS rl,rh,s
- mrrc2 p4,#\s,\rl,\rh,c4
-.endm
-.macro PYMS rl,rh,s
- mrrc2 p4,#\s,\rl,\rh,c5
-.endm
-.macro PXYH rl,rh
- mrrc2 p4,#1,\rl,\rh,c1
-.endm
-.macro PYMR rl,rh
- mrrc2 p4,#2,\rl,\rh,c1
-.endm
-.macro PXMQ rl,rh
- mrrc2 p4,#4,\rl,\rh,c1
-.endm
-.macro PDDA rl,rh
- mrrc2 p4,#1,\rl,\rh,c0
-.endm
-.macro PDDS rl,rh
- mrrc2 p4,#3,\rl,\rh,c0
-.endm
-.macro PDDM rl,rh
- mrrc2 p4,#5,\rl,\rh,c0
-.endm
-.macro PDDD rl,rh
- mrrc2 p4,#7,\rl,\rh,c0
-.endm
-.macro PDDQ rl,rh
- mrrc2 p4,#9,\rl,\rh,c0
-.endm
-.macro PDDG rl,rh
- mrrc2 p4,#11,\rl,\rh,c0
-.endm
-
 
 // Canned instruction sequences for use with the DCP
-
-.macro dcp_fadd_m rz,rx,ry
-  WXYU \rx,\ry
-  ADD0
-  ADD1
-  NRDF
-  RDFA \rz
-.endm
-
-.macro dcp_fsub_m rz,rx,ry
-  WXYU \rx,\ry
-  ADD0
-  SUB1
-  NRDF
-  RDFS \rz
-.endm
-
-.macro dcp_fmul_m rz,rx,ry,ra,rb
-  WXYU \rx,\ry
-  RXYH \ra,\rb
-  umull \ra,\rb,\ra,\rb
-  WXFM \ra,\rb
-  NRDF
-  RDFM \rz
-.endm
-
-.macro dcp_fxprod_m rzl,rzh,rx,ry,ra,rb
-  WXYU \rx,\ry
-  RXYH \ra,\rb
-  umull \ra,\rb,\ra,\rb
-  WXMO \ra,\rb
-  NRDD
-  RDDM \rzl,\rzh
-.endm
-
-.macro dcp_fdiv_fast_m rz,rx,ry,ra,rb,rc
-  WXYU \rx,\ry
-  RYMR \ra,\rb
-  umull \rb,\rc,\ra,\rb
-  mvn \rc,\rc,lsl #2
-  smmlar \ra,\rc,\ra,\ra
-  smmulr \rc,\rc,\rc
-  smmlar \ra,\rc,\ra,\ra
-  RXYH \rb,\rc
-  umull \ra,\rb,\ra,\rb
-  WXFD \rb,\rb
-  NRDF
-  RDFD \rz
-.endm
-
-.macro dcp_fdiv_m rz,rx,ry,ra,rb,rc,rd
-  WXYU \rx,\ry
-  RYMR \ra,\rb
-  umull \rb,\rc,\ra,\rb
-  mvn \rc,\rc,lsl #2
-  smmlar \ra,\rc,\ra,\ra
-  smmulr \rc,\rc,\rc
-  smmlar \ra,\rc,\ra,\ra
-  RXYH \rb,\rc
-  umull \rd,\ra,\ra,\rb
-  orr \ra,\ra,\ra,lsr #24
-  bic \ra,\ra,\ra,lsr #25
-  bic \ra,\ra,#15
-  mov \rc,\rc,lsr #7
-  mul \rd,\ra,\rc
-  rsb \rd,\rd,\rb,lsl #22
-  sub \ra,\ra,\rd,lsr #31
-  WXFD \ra,\ra
-  NRDF
-  RDFD \rz
-.endm
-
-.macro dcp_fsqrt_fast_m rz,rx,ra,rb,rc,rd
-  WXYU \rx,\rx
-  SQR0
-  RXMQ \rc,\rd
-  umull \ra,\rb,\rc,\rc
-  umull \ra,\rb,\rb,\rd
-  mov \rb,\rb,lsl #3
-  sub \rb,\rb,#2147483648
-  smmlsr \rc,\rc,\rb,\rc
-  umull \ra,\rb,\rc,\rc
-  umull \ra,\rb,\rb,\rd
-  movs \ra,\ra,lsr #28
-  adc \rb,\ra,\rb,lsl #4
-  smmulr \ra,\rb,\rc
-  sub \rc,\rc,\ra,asr #1
-  umull \ra,\rb,\rc,\rd
-  WXFQ \ra,\rb
-  NRDF
-  RDFQ \rz
-.endm
-
-.macro dcp_fsqrt_m rz,rx,ra,rb,rc,rd
-  WXYU \rx,\rx
-  SQR0
-  RXMQ \rc,\rd
-  umull \ra,\rb,\rc,\rc
-  umull \ra,\rb,\rb,\rd
-  mov \rb,\rb,lsl #3
-  sub \rb,\rb,#2147483648
-  smmlsr \rc,\rc,\rb,\rc
-  umull \ra,\rb,\rc,\rc
-  umull \ra,\rb,\rb,\rd
-  movs \ra,\ra,lsr #28
-  adc \rb,\ra,\rb,lsl #4
-  smmulr \ra,\rb,\rc
-  sub \rc,\rc,\ra,asr #1
-  umull \ra,\rb,\rc,\rd
-  orr \rb,\rb,#63
-  mov \ra,\rb,lsr #5
-  mul \ra,\ra,\ra
-  rsb \ra,\ra,\rd,lsl #18
-  bic \rb,\rb,\ra,lsr #26
-  WXFQ \ra,\rb
-  NRDF
-  RDFQ \rz
-.endm
-
-.macro dcp_fclassify_m rz,rx
-  WXYU \rx,\rx
-  RXVD \rz
-.endm
-
-.macro dcp_fcmp_m rz,rx,ry
-  WXYU \rx,\ry
-  ADD0
-  RCMP \rz
-.endm
 
 .macro dcp_dadd_m rzl,rzh,rxl,rxh,ryl,ryh
   WXUP \rxl,\rxh
@@ -438,32 +192,6 @@ double_section WRAPPER_FUNC_NAME(\func)
   WXMO \rg,\re
   NRDD
   RDDM \rzl,\rzh
-.endm
-
-.macro dcp_ddiv_fast_m rzl,rzh,rxl,rxh,ryl,ryh,ra,rb,rc,rd,re
-  WXUP \rxl,\rxh
-  WYUP \ryl,\ryh
-  RYMR \ra,\rb
-  umull \rb,\rc,\ra,\rb
-  mvn \rc,\rc,lsl #2
-  smmlar \ra,\rc,\ra,\ra
-  smmulr \rc,\rc,\rc
-  smmlar \ra,\rc,\ra,\ra
-  sub \re,\ra,\ra,lsr #31
-  RXMS \rc,\rd,0
-  smmulr \rb,\re,\rd
-  RYMS \rc,\rd,1
-  umull \rc,\ra,\rb,\rc
-  mla \ra,\rb,\rd,\ra
-  RXMS \rc,\rd,4
-  sub \ra,\rc,\ra
-  smmulr \rc,\ra,\re
-  mov \rd,\rb,lsr #4
-  adds \ra,\rc,\rb,lsl #28
-  adc \rb,\rd,\rc,asr #31
-  WXDD \ra,\rb
-  NRDD
-  RDDD \rzl,\rzh
 .endm
 
 .macro dcp_ddiv_m rzl,rzh,rxl,rxh,ryl,ryh,ra,rb,rc,rd,re
@@ -504,34 +232,6 @@ double_section WRAPPER_FUNC_NAME(\func)
   RDDD \rzl,\rzh
 .endm
 
-.macro dcp_dsqrt_fast_m rzl,rzh,rxl,rxh,ra,rb,rc,rd,re
-  WXUP \rxl,\rxh
-  SQR0
-  RXMQ \rc,\rd
-  umull \ra,\rb,\rc,\rc
-  umull \ra,\rb,\rb,\rd
-  mov \rb,\rb,lsl #3
-  sub \rb,\rb,#2147483648
-  smmlsr \rc,\rc,\rb,\rc
-  umull \ra,\rb,\rc,\rc
-  umull \ra,\rb,\rb,\rd
-  movs \ra,\ra,lsr #28
-  adc \rb,\ra,\rb,lsl #4
-  smmulr \ra,\rb,\rc
-  sub \rc,\rc,\ra,asr #1
-  umull \ra,\rb,\rc,\rd
-  mov \rb,\rb,lsr #1
-  umull \rd,\ra,\rb,\rb
-  RXMS \ra,\re,6
-  sub \ra,\ra,\rd
-  smmulr \ra,\ra,\rc
-  add \rb,\rb,\ra,asr #28
-  mov \ra,\ra,lsl #4
-  WXDQ \ra,\rb
-  NRDD
-  RDDQ \rzl,\rzh
-.endm
-
 .macro dcp_dsqrt_m rzl,rzh,rxl,rxh,ra,rb,rc,rd,re
   WXUP \rxl,\rxh
   SQR0
@@ -569,22 +269,11 @@ double_section WRAPPER_FUNC_NAME(\func)
   RDDQ \rzl,\rzh
 .endm
 
-.macro dcp_dclassify_m rz,rxl,rxh
-  WXUP \rxl,\rxh
-  RXVD \rz
-.endm
-
 .macro dcp_dcmp_m rz,rxl,rxh,ryl,ryh
   WXUP \rxl,\rxh
   WYUP \ryl,\ryh
   ADD0
   RCMP \rz
-.endm
-
-.macro dcp_float2double_m rzl,rzh,rx
-  WXYU \rx,\rx
-  NRDD
-  RDDG \rzl,\rzh
 .endm
 
 .macro dcp_double2float_m rz,rxl,rxh
@@ -609,22 +298,6 @@ double_section WRAPPER_FUNC_NAME(\func)
   RDDS \rzl,\rzh
 .endm
 
-.macro dcp_int2float_m rz,rx
-  WXIC \rx,\rx
-  ADD0
-  SUB1
-  NRDF
-  RDFS \rz
-.endm
-
-.macro dcp_uint2float_m rz,rx
-  WXUC \rx,\rx
-  ADD0
-  SUB1
-  NRDF
-  RDFS \rz
-.endm
-
 .macro dcp_double2int_m rz,rxl,rxh
   WXDC \rxl,\rxh
   ADD0
@@ -641,57 +314,9 @@ double_section WRAPPER_FUNC_NAME(\func)
   RDUC \rz
 .endm
 
-.macro dcp_float2int_m rz,rx
-  WXFC \rx,\rx
-  ADD0
-  ADD1
-  NTDC
-  RDIC \rz
-.endm
-
-.macro dcp_float2uint_m rz,rx
-  WXFC \rx,\rx
-  ADD0
-  ADD1
-  NTDC
-  RDUC \rz
-.endm
-
-.macro dcp_double2int_r_m rz,rxl,rxh
-  WXDC \rxl,\rxh
-  ADD0
-  ADD1
-  NRDC
-  RDIC \rz
-.endm
-
-.macro dcp_double2uint_r_m rz,rxl,rxh
-  WXDC \rxl,\rxh
-  ADD0
-  ADD1
-  NRDC
-  RDUC \rz
-.endm
-
-.macro dcp_float2int_r_m rz,rx
-  WXFC \rx,\rx
-  ADD0
-  ADD1
-  NRDC
-  RDIC \rz
-.endm
-
-.macro dcp_float2uint_r_m rz,rx
-  WXFC \rx,\rx
-  ADD0
-  ADD1
-  NRDC
-  RDUC \rz
-.endm
-
 // ============== STATE SAVE AND RESTORE ===============
 
-.macro saving_func type func, opt_label1='-', opt_label2='-'
+.macro saving_func type func
   // Note we are usually 32-bit aligned already at this point, as most of the
   // function bodies contain exactly two 16-bit instructions: bmi and bx lr.
   // We want the PCMP word-aligned.
@@ -703,12 +328,6 @@ double_section WRAPPER_FUNC_NAME(\func)
   push {lr}              // 16-bit instruction
   bl generic_save_state  // 32-bit instruction
   b 1f                   // 16-bit instruction
-.ifnc \opt_label1,'-'
-regular_func \opt_label1
-.endif
-.ifnc \opt_label2,'-'
-regular_func \opt_label2
-.endif
   // This is the actual entry point:
 \type\()_func \func
   PCMP apsr_nzcv

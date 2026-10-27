@@ -32238,6 +32238,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         continue not to.</description
                     >
                     <resetValue>0x00000004</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DEBUG</name>
@@ -32270,6 +32274,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         internally based on security state but not on master ID.</description
                     >
                     <resetValue>0x00000000</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>CORE1</name>
@@ -32289,6 +32297,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         contents.</description
                     >
                     <resetValue>0x00000000</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>CFGRESET</name>
@@ -32364,6 +32376,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -32440,6 +32456,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -32518,6 +32538,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -32594,6 +32618,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -32670,6 +32698,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -32746,6 +32778,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -32822,6 +32858,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -32898,6 +32938,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -32974,6 +33018,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33050,6 +33098,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33126,6 +33178,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33202,6 +33258,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33278,6 +33338,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33354,6 +33418,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33432,6 +33500,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33508,6 +33580,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33584,6 +33660,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33660,6 +33740,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         Non-secure-Privileged-writable when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33738,6 +33822,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         Non-secure-Privileged-writable when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33817,6 +33905,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000ff</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33895,6 +33987,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -33971,6 +34067,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         bit is set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34049,6 +34149,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         bit is set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34127,6 +34231,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         bit is set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34205,6 +34313,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         bit is set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34283,6 +34395,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34361,6 +34477,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34437,6 +34557,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34513,6 +34637,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34589,6 +34717,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34665,6 +34797,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34741,6 +34877,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34817,6 +34957,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34893,6 +35037,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -34969,6 +35117,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35045,6 +35197,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35121,6 +35277,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35197,6 +35357,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35273,6 +35437,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         set.</description
                     >
                     <resetValue>0x000000fc</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35349,6 +35517,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35425,6 +35597,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35501,6 +35677,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         bit is set.</description
                     >
                     <resetValue>0x000000f8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35577,6 +35757,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35653,6 +35837,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35729,6 +35917,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35805,6 +35997,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35881,6 +36077,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -35959,6 +36159,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -36037,6 +36241,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -36113,6 +36321,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         Non-secure-Privileged-writable when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -36191,6 +36403,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -36267,6 +36483,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         Non-secure-Privileged-writable when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -36345,6 +36565,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         when the NSP bit is set.</description
                     >
                     <resetValue>0x000000b8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -36423,6 +36647,10 @@ SPDX-License-Identifier: BSD-3-Clause
                         bit is set.</description
                     >
                     <resetValue>0x000000f8</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
+                         16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
+                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         adds the key field, so every write names it. -->
                     <fields>
                         <field>
                             <name>DBG</name>
@@ -38464,6 +38692,10 @@ SPDX-License-Identifier: BSD-3-Clause
                     <addressOffset>0x0000002c</addressOffset>
                     <description>Chip reset control and status</description>
                     <resetValue>0x00000000</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0x5AFE: protected POWMAN register (offset <= 0xAC), a write is ignored unless
+                         bits 31:16 carry the password; read-only fields sit in that range ("Protected registers obviously don't have
+                         writeable fields in the top 16 bits, however they may have read-only fields in that range", RP2350 datasheet 6.4,
+                         md l.23076-23082), so it is no field here: svd_converter adds the key field. -->
                     <fields>
                         <field>
                             <name>HAD_WATCHDOG_RESET_RSM</name>
@@ -38675,6 +38907,10 @@ SPDX-License-Identifier: BSD-3-Clause
                     <addressOffset>0x00000034</addressOffset>
                     <description>For configuration of the power sequencer Writes are ignored while POWMAN_STATE_CHANGING=1</description>
                     <resetValue>0x001011f0</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0x5AFE: protected POWMAN register (offset <= 0xAC), a write is ignored unless
+                         bits 31:16 carry the password; read-only fields sit in that range ("Protected registers obviously don't have
+                         writeable fields in the top 16 bits, however they may have read-only fields in that range", RP2350 datasheet 6.4,
+                         md l.23076-23082), so it is no field here: svd_converter adds the key field. -->
                     <fields>
                         <field>
                             <name>USING_FAST_POWCK</name>
@@ -39618,6 +39854,10 @@ SPDX-License-Identifier: BSD-3-Clause
                     <name>TIMER</name>
                     <addressOffset>0x00000088</addressOffset>
                     <resetValue>0x00000000</resetValue>
+                    <!-- Kvasir: write key PASSWORD[31:16] = 0x5AFE: protected POWMAN register (offset <= 0xAC), a write is ignored unless
+                         bits 31:16 carry the password; read-only fields sit in that range ("Protected registers obviously don't have
+                         writeable fields in the top 16 bits, however they may have read-only fields in that range", RP2350 datasheet 6.4,
+                         md l.23076-23082), so it is no field here: svd_converter adds the key field. -->
                     <fields>
                         <field>
                             <name>USING_GPIO_1HZ</name>
@@ -80570,6 +80810,24 @@ SPDX-License-Identifier: BSD-3-Clause
             <interrupt>
                 <name>SPARE_IRQ_5</name>
                 <value>51</value>
+            </interrupt>
+        </peripheral>
+        <peripheral>
+            <!-- Kvasir: interrupt lines only: PROC0_IRQ_CTI 40, PROC1_IRQ_CTI 41 (RP2350 datasheet Table 95, md l.3780-3781), missing in the vendor SVD -->
+            <name>PROC_CTI</name>
+            <baseAddress>0x00000000</baseAddress>
+            <addressBlock>
+                <offset>0</offset>
+                <size>4</size>
+                <usage>reserved</usage>
+            </addressBlock>
+            <interrupt>
+                <name>PROC0_IRQ_CTI</name>
+                <value>40</value>
+            </interrupt>
+            <interrupt>
+                <name>PROC1_IRQ_CTI</name>
+                <value>41</value>
             </interrupt>
         </peripheral>
     </peripherals>

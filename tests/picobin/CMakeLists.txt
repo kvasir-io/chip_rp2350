@@ -6,8 +6,9 @@ cmake_minimum_required(VERSION 3.28)
 # tests/picobin/build
 #
 # * picobin_test.cpp: the encodings against the RP2350 datasheet (5.9) and picotool's writer, and the block size limits.
-#   Most checks are static_asserts, so building is the test; the program checks the same words at run time and prints
-#   what it compared.
+# * reader_test.cpp: PicobinReader.hpp, the boot ROM's walk read back (data/README.md: the picotool-made inputs). Most
+#   checks are static_asserts, so building is the test; the program checks the same words at run time and prints what it
+#   compared.
 # * bad/*_fail.cpp: blocks that must NOT compile, each with the message it must fail with (first line `// expect: ...`).
 #   The `_fail.cpp` suffix keeps them out of clang-tidy (Kvasir_SDK tools/tidy_keep.toml [must_fail]).
 #
@@ -59,6 +60,15 @@ add_executable(picobin_test picobin_test.cpp)
 target_include_directories(picobin_test PRIVATE ${_chip_src})
 target_compile_options(picobin_test PRIVATE ${_warnings})
 add_test(NAME picobin_test COMMAND picobin_test)
+
+# chip/PicobinReader.hpp: the boot ROM's block walk, against picotool's tables and a picotool-sealed image (data/) and a
+# fuzz of Walker fed in pieces; under ASan + UBSan, its reads into the ROM's buffer are what it is about
+add_executable(reader_test reader_test.cpp)
+target_include_directories(reader_test PRIVATE ${_chip_src})
+target_compile_options(reader_test PRIVATE ${_warnings} -fsanitize=address,undefined -fno-sanitize-recover=all)
+target_link_options(reader_test PRIVATE -fsanitize=address,undefined)
+target_compile_definitions(reader_test PRIVATE PICOBIN_TEST_DATA="${CMAKE_CURRENT_LIST_DIR}/data")
+add_test(NAME reader_test COMMAND reader_test)
 
 # ---- blocks that must not compile
 file(GLOB _bad CONFIGURE_DEPENDS ${CMAKE_CURRENT_LIST_DIR}/bad/*_fail.cpp)

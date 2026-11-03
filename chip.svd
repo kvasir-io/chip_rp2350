@@ -54420,6 +54420,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK0</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>
@@ -54436,6 +54438,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK1</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>
@@ -54452,6 +54456,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK2</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>
@@ -54468,6 +54474,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK3</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>
@@ -54484,6 +54492,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK4</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>
@@ -54500,6 +54510,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK5</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>
@@ -54516,6 +54528,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK6</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>
@@ -54532,6 +54546,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK7</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <readAction>modify</readAction>
                         </field>
                     </fields>
                 </register>

@@ -62,7 +62,10 @@ namespace Kvasir { namespace Startup {
 
         // The counterpart of FirstInitStep's EXTEXCLALL write: without it core 1's exclusives use its local monitor
         // only and no lock in the system holds.
-        void operator()() { Rp::BootTraits::routeExclusivesGlobally(); }
+        void operator()() {
+            Rp::BootTraits::routeExclusivesGlobally();
+            this->armLockout();
+        }
     };
 
     // The stack guard's per-boot value: the boot ROM's BOOT_RANDOM, "a 128-bit random number

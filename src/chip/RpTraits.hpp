@@ -16,8 +16,14 @@ struct ChipTraits {
     // The ring oscillator before its divider, at most: "During boot, the ROSC runs at a nominal 11MHz and is guaranteed
     // to be in the range 4.6MHz to 19.6MHz without randomisation and 4.6MHz to 24.0MHz with randomisation" (RP2350
     // datasheet 8.3.1, md l.27985) at the boot path's divisor 8 ("the ROSC divider from 8 to 2", md l.66193; the A3+
-    // boot ROM at DIV 2: 18.4 to 96.0 MHz, md l.27989): 192 MHz undivided, nothing in Kvasir writes FREQA/FREQB/
-    // FREQ_RANGE (rp_common clock_config.hpp roscRefDivisor). Its slowest output: 4.6 MHz at divisor 8.
+    // boot ROM at DIV 2: 18.4 to 96.0 MHz, md l.27989): 192 MHz undivided (rp_common clock_config.hpp roscRefDivisor).
+    // A stage before the image may have raised it past this ceiling - picotool's decryption stage sets FREQ_RANGE
+    // HIGH, every drive to 7 and DIV 2: "~110MHz" by its comment (enc_bootloader.c runtime_init_clocks), 140 MHz
+    // measured, ~280 MHz undivided -: the divisor for clk_ref raises this ceiling by the range and drives it finds
+    // (clock_config.hpp roscRaisedHalves) rather than lowering them, which glitches the clock clk_sys runs from
+    // (RP2350 datasheet 8.3.5). Kvasir writes the ROSC only to switch its randomisation off (roscRandomisationOff).
+    // Clocks::CrystalCheck records its registers as found and as the crystal was counted against them. Its slowest
+    // output: 4.6 MHz at divisor 8.
     static constexpr std::uint64_t roscBaseHzCeiling = 192'000'000;
     static constexpr std::uint64_t roscHzFloor       = 4'600'000;
     // The fastest clk_ref on the ring oscillator Kvasir lets it run at (rp_common clock_config.hpp onRingOscillator

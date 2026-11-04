@@ -1,2 +1,4 @@
 __pycache__/
 tests/**/build*/
+# tools/rom_stack.py: Kvasir_SDK cloned when no sibling checkout is there
+.kvasir_sdk/

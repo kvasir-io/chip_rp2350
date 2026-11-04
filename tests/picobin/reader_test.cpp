@@ -525,6 +525,68 @@ void slots() {
           "a flat image at 0: slot 0, no table");
 }
 
+/// A FlashWalker fed from `flash` in its own reads: the walk, and how many bytes it read and where its last read ended.
+struct CountedWalk {
+    Pb::FlashWalker walker;
+    std::size_t     bytesRead{};
+    std::size_t     furthest{};
+};
+
+CountedWalk countedFlashWalk(std::vector<std::byte> const& flash,
+                             bool                          hashImageDefs) {
+    CountedWalk out{
+      .walker
+      = Pb::FlashWalker{static_cast<std::uint32_t>(flash.size()), {}, std::nullopt, hashImageDefs}
+    };
+    while(auto const read = out.walker.want()) {
+        auto const [at, length] = *read;
+        auto const from         = std::min<std::size_t>(at, flash.size());
+        auto const n            = std::min<std::size_t>(length, flash.size() - from);
+        out.bytesRead += n;
+        out.furthest = std::max(out.furthest, from + n);
+        out.walker.feed(std::span{flash}.subspan(from, n));
+    }
+    return out;
+}
+
+void tableOnly() {
+    // The partition table without the image's hash (Walker's hashImageDef false): a table that is no singleton sends
+    // the slot search on to slot 1, here a partition from 4 KiB holding a sealed image - hashed, every byte of it is
+    // read; table-only, the walk and every choice in it are the same and the reads end with its block loop.
+    auto const             table = readFile("pt_ab.bin");
+    auto const             image = readFile("blink_sealed.bin");
+    std::vector<std::byte> flash(Pb::defaultSlotSize + image.size() + Pb::defaultSlotSize,
+                                 std::byte{0xff});
+    std::ranges::copy(table, flash.begin());
+    std::ranges::copy(image, flash.begin() + Pb::defaultSlotSize);
+    auto const hashed    = countedFlashWalk(flash, true);
+    auto const tableOnly = countedFlashWalk(flash, false);
+    check(hashed.walker.done() && tableOnly.walker.done(), "table only: both walks end");
+    check(hashed.walker.partitionTable().has_value()
+            && hashed.walker.partitionTable() == tableOnly.walker.partitionTable()
+            && hashed.walker.slot() == tableOnly.walker.slot(),
+          "table only: the same table from the same slot");
+    auto const slot1 = Pb::FlashWalker{static_cast<std::uint32_t>(flash.size())};
+    static_cast<void>(slot1);
+    check(hashed.bytesRead > image.size(), "hashed: the image is read (its load map's sources)");
+    check(tableOnly.bytesRead < image.size() / 2U, "table only: the image's code is not read");
+    std::printf("table only: %zu bytes read hashed, %zu table-only (image %zu)\n",
+                hashed.bytesRead,
+                tableOnly.bytesRead,
+                image.size());
+    // the caveat: a slot 0 without a table decides alone only with a verified IMAGE_DEF - a hashed one read table-only
+    // is `unchecked`, so slot 1 is searched as well
+    auto const sealedAt0  = readFile("tiny_sealed.bin");
+    auto const decides    = countedFlashWalk(sealedAt0, true);
+    auto const notDecided = countedFlashWalk(sealedAt0, false);
+    check(decides.walker.imageDef().value_or(Pb::ParsedBlock{}).hash == Pb::ParsedBlock::Hash::ok,
+          "a sealed flat image, hashed: its IMAGE_DEF verified");
+    check(notDecided.walker.loop().imageDef().value_or(Pb::ParsedBlock{}).hash
+              == Pb::ParsedBlock::Hash::unchecked
+            || !notDecided.walker.imageDef().has_value(),
+          "the same, table only: the hash unchecked");
+}
+
 void chooser() {
     auto const block = [](std::uint16_t major, bool tbyb = false, bool bad = false) {
         Pb::ParsedBlock b{};
@@ -928,6 +990,7 @@ int main() {
     picotoolSealed();
     picotoolHashes();
     slots();
+    tableOnly();
     chooser();
     romVersions();
     otpRules();

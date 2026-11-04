@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.28)
 # * reader_test.cpp: PicobinReader.hpp, the boot ROM's walk read back (data/README.md: the picotool-made inputs). Most
 #   checks are static_asserts, so building is the test; the program checks the same words at run time and prints what it
 #   compared.
+# * seal_test.cpp: PicobinSeal.hpp, images sealed as A/B updates (picotool's sealed ones again among them) and walked.
 # * bad/*_fail.cpp: blocks that must NOT compile, each with the message it must fail with (first line `// expect: ...`).
 #   The `_fail.cpp` suffix keeps them out of clang-tidy (Kvasir_SDK tools/tidy_keep.toml [must_fail]).
 #
@@ -69,6 +70,15 @@ target_compile_options(reader_test PRIVATE ${_warnings} -fsanitize=address,undef
 target_link_options(reader_test PRIVATE -fsanitize=address,undefined)
 target_compile_definitions(reader_test PRIVATE PICOBIN_TEST_DATA="${CMAKE_CURRENT_LIST_DIR}/data")
 add_test(NAME reader_test COMMAND reader_test)
+
+# chip/PicobinSeal.hpp: images sealed as A/B updates and walked back (the reader judges them), picotool's sealed images
+# among them; the compile-time seal is a static_assert
+add_executable(seal_test seal_test.cpp)
+target_include_directories(seal_test PRIVATE ${_chip_src})
+target_compile_options(seal_test PRIVATE ${_warnings} -fsanitize=address,undefined -fno-sanitize-recover=all)
+target_link_options(seal_test PRIVATE -fsanitize=address,undefined)
+target_compile_definitions(seal_test PRIVATE PICOBIN_TEST_DATA="${CMAKE_CURRENT_LIST_DIR}/data")
+add_test(NAME seal_test COMMAND seal_test)
 
 # ---- blocks that must not compile
 file(GLOB _bad CONFIGURE_DEPENDS ${CMAKE_CURRENT_LIST_DIR}/bad/*_fail.cpp)

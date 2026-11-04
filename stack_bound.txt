@@ -1,16 +1,75 @@
 # The stack bound's notes for RP2350 images (Kvasir_SDK cmake/tools/stack_bound.py; directives: its docstring).
 #
 # The boot ROM: 32 kB at 0x00000000 (RP2350 datasheet 4.1 "ROM"). Its functions are found through rom_table_lookup_val(),
-# a 16-bit pointer at 0x00000016 (5.4.1 "Locating the API functions", the bootrom contents table). A call into the ROM
-# runs code whose stack use the datasheet does not give (5.4: none for the Arm functions) and that is not measured here:
-# every image that reaches one is a LOWER BOUND, and the report names each caller.
+# a 16-bit pointer at 0x00000016 (5.4.1 "Locating the API functions", the bootrom contents table). They run on the
+# caller's stack, and the datasheet gives no figure for it (5.4: none for the Arm functions). The budgets below are
+# measured on the ROM itself: chip_rp2350/tools/rom_stack.py over a dump read over SWD - the deepest path of each entry,
+# frames read from its code, nothing it calls left unresolved. An image runs on whichever revision the chip has, so each
+# budget is the larger of the revisions measured:
+#
+#   function                          A2      A4    budget
+#   lookup (0x16)                      8 B     8 B     8 B
+#   connect_internal_flash IF         36 B    52 B    52 B
+#   flash_exit_xip EX                 80 B    80 B    80 B
+#   flash_flush_cache FC               0 B     0 B     0 B
+#   flash_range_erase RE             112 B   104 B   112 B
+#   flash_range_program RP           104 B   104 B   104 B
+#   explicit_buy EB                  168 B   184 B   184 B
+#   flash_runtime_to_storage_addr FA  12 B    12 B    12 B
+#   flash_op FO                      216 B   208 B   216 B
+#   get_partition_table_info GP      176 B   176 B   176 B
+#   get_sys_info GS                   96 B   108 B   108 B
+#   otp_access OA                     80 B    80 B    80 B
+#   reboot RB                         40 B    60 B    60 B
+#   flash_select_xip_read_mode XM      0 B     0 B     0 B
+#   load_partition_table LP: a LOWER BOUND on both (its code reaches calls the tool cannot follow) - no budget
+#
+#   A2: version byte (0x13) 2, SHA-256 196c503fbb17b2ad21a1f496574786af698f9376af9a5f79e5e75293c9e12191
+#   A4: version byte 4, SHA-256 cb681bd21bb6ecf63326ec56a2e212c872760574661b796e8443b2dccf8a0b3b (two boards, identical)
+#
+# A3 is not measured: on an A3 these hold only once rom_stack.py has run over its ROM (it prints the version and the
+# hash). A function below without a byte count stays a LOWER BOUND, and the report names each caller.
 rom_region 0x00000000 0x00008000
 rom_pointer 0x16
 
-# Kvasir::Detail::FlashXipDisabler (chip_rp_common XipControl.hpp) keeps the ROM functions it looked up in members and
-# calls them from RAM while the flash is off
-rom Kvasir::Detail::FlashXipDisabler::*
+# RomFunctions (chip_rp_common Rom.hpp): the lookup, and call<> - out of line both, so the ROM calls stay here. The
+# budget of call<> is the deepest of the codes it is instantiated for (its full name holds them: (char)C1, (char)C2).
+rom Kvasir::RomFunctions::getRomFunctionPointer 8
+rom Kvasir::RomFunctions::getRomFunctionPointerFromRam 8
+rom *Kvasir::RomFunctions::call<(char)70,?(char)65,* 12
+rom *Kvasir::RomFunctions::call<(char)70,?(char)79,* 216
+rom *Kvasir::RomFunctions::call<(char)71,?(char)80,* 176
+rom *Kvasir::RomFunctions::call<(char)71,?(char)83,* 108
+rom *Kvasir::RomFunctions::call<(char)79,?(char)65,* 80
+rom *Kvasir::RomFunctions::call<(char)82,?(char)66,* 60
+# any other code: not measured
+rom Kvasir::RomFunctions::*
 
-# RomFunctions::call (chip_rp_common Rom.hpp) hands the looked-up ROM function to std::invoke; when LTO keeps that
-# std::invoke out of line, its call through the parameter is the ROM call
-rom std::__2::__invoke_result_impl*
+# Kvasir::Flash::XipDisabler (chip_rp_common XipControl.hpp) keeps the ROM functions it looked up in members and
+# calls them from RAM while the flash is off: disable() connect_internal_flash and flash_exit_xip, one after the other;
+# enable() flash_flush_cache, then the XIP setup the boot ROM left in BOOTRAM (its copy: the ROM's default stub, five
+# instructions that load r0/r1 and tail-call flash_select_xip_read_mode - pico-bootrom-rp2350 varm_misc.S, read back on
+# an A2: no frame of its own).
+rom Kvasir::Flash::XipDisabler::disable 80
+rom Kvasir::Flash::XipDisabler::enable 0
+rom Kvasir::Flash::XipDisabler::*
+
+# The flash operations run the ROM function they are handed as a parameter, with XIP off (rp_common FlashOps.hpp,
+# BootInfo.hpp)
+rom Kvasir::Detail::flashEraseImpl 112
+rom Kvasir::Detail::flashWriteImpl 104
+rom Kvasir::Detail::explicitBuyImpl 184
+rom Kvasir::Detail::loadPartitionTableImpl
+
+# Kvasir::Clocks::Resus (rp_common ClockOutput.hpp): the resuscitation interrupt flushes the XIP cache through the ROM's
+# flash_flush_cache, looked up once and kept in a static (flushCache_)
+rom Kvasir::Clocks::Resus::onIsr 0
+
+# Kvasir::DMA::DmaBase::onIsr (rp_common DMA.hpp) runs each finished channel's StaticFunction<void()> callback: one of
+# the StaticFunction<void()> invokers (the lambda its constructor stores: `__invoke` clang, `_FUN` gcc)
+calls Kvasir::DMA::DmaBase::onIsr Kvasir::StaticFunction<void?(),*::__invoke* Kvasir::StaticFunction<void(),*::__invoke* Kvasir::StaticFunction<void?(),*::_FUN* Kvasir::StaticFunction<void(),*::_FUN*
+
+# Kvasir::ADC::ADCDmaBehavior (rp_common ADC.hpp): the DMA callback it arms hands the finished buffer on to the
+# application's StaticFunction<void(std::span<std::uint16_t>, std::size_t)> (ADCDmaBehavior's DMA callback)
+calls Kvasir::StaticFunction<void?(),*>::StaticFunction<Kvasir::ADC::ADCDmaBehavior<* Kvasir::StaticFunction<void?(std::*span<unsigned?short*::__invoke* Kvasir::StaticFunction<void(std::*span<unsigned?short*::_FUN*
+calls Kvasir::StaticFunction<void(),*>::StaticFunction<Kvasir::ADC::ADCDmaBehavior<* Kvasir::StaticFunction<void?(std::*span<unsigned?short*::__invoke* Kvasir::StaticFunction<void(std::*span<unsigned?short*::_FUN*

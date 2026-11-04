@@ -317,26 +317,39 @@ double_section WRAPPER_FUNC_NAME(\func)
 // ============== STATE SAVE AND RESTORE ===============
 
 .macro saving_func type func
-  // Note we are usually 32-bit aligned already at this point, as most of the
-  // function bodies contain exactly two 16-bit instructions: bmi and bx lr.
   // We want the PCMP word-aligned.
 .p2align 2
-  // When the engaged flag is set, branch back here to invoke save routine and
-  // hook lr with the restore routine, then fall back through to the entry
-  // point. The engaged flag will be clear when checked a second time.
-1:
-  push {lr}              // 16-bit instruction
-  bl generic_save_state  // 32-bit instruction
-  b 1f                   // 16-bit instruction
-  // This is the actual entry point:
 \type\()_func \func
   PCMP apsr_nzcv
-  bmi 1b
-1:
+  // When the engaged flag is set, branch to the save path (saving_func_end) to invoke the save routine and hook lr
+  // with the restore routine, which comes back here; the engaged flag will be clear when checked the second time.
+  bmi .Lsave_\func
+.Lbody_\func:
 .endm
 
-.macro saving_func_return
+// A saving_func's end: its save path, then its .size. The path lies inside the function, after its body, so the
+// function is one range that holds every instruction it runs - in front of the entry, as it was, the stub was the end
+// of the function before it (no .size) or code of none, and the static stack bound (cmake/tools/stack_bound.py) saw
+// the wrappers call each other in a chain and calls into code without a symbol.
+.macro saving_func_end type func
+.Lsave_\func:
+  push {lr}              // 16-bit instruction
+  bl generic_save_state  // 32-bit instruction
+  b .Lbody_\func         // 16-bit instruction
+  \type\()_size \func
+.endm
+
+.macro saving_func_return type func
   bx lr
+  saving_func_end \type \func
+.endm
+
+.macro regular_size x
+.size \x, . - \x
+.endm
+
+.macro wrapper_size x
+regular_size WRAPPER_FUNC_NAME(\x)
 .endm
 
 double_section __rp2350_dcp_engaged_state_save_restore
@@ -371,29 +384,30 @@ generic_restore_state:
 double_wrapper_section __aeabi_dadd
 saving_func wrapper __aeabi_dadd
   dcp_dadd_m r0,r1,r0,r1,r2,r3
-  saving_func_return
+  saving_func_return wrapper __aeabi_dadd
 
 double_wrapper_section __aeabi_dsub
 saving_func wrapper __aeabi_dsub
   dcp_dsub_m r0,r1,r0,r1,r2,r3
-  saving_func_return
+  saving_func_return wrapper __aeabi_dsub
 
 double_wrapper_section __aeabi_drsub
 saving_func wrapper __aeabi_drsub
   dcp_dsub_m r0,r1,r2,r3,r0,r1
-  saving_func_return
+  saving_func_return wrapper __aeabi_drsub
 
 double_wrapper_section __aeabi_dmul
 saving_func wrapper __aeabi_dmul
 push {r4,r14}
 dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r12,r14
 pop {r4,pc}
+saving_func_end wrapper __aeabi_dmul
 
 double_wrapper_section __aeabi_ddiv
 saving_func wrapper __aeabi_ddiv
 @ with correct rounding
   dcp_ddiv_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r12
-  saving_func_return
+  saving_func_return wrapper __aeabi_ddiv
 
 double_wrapper_section sqrt
 saving_func wrapper sqrt
@@ -405,7 +419,7 @@ saving_func wrapper sqrt
 #if defined(__ARM_PCS_VFP)
   vmov d0,r0,r1
 #endif
-  saving_func_return
+  saving_func_return wrapper sqrt
 
 // ============== CONVERSION FUNCTIONS ===============
 
@@ -413,30 +427,30 @@ double_wrapper_section __aeabi_d2f
 saving_func wrapper __aeabi_d2f
 @ with rounding
   dcp_double2float_m r0,r0,r1
-  saving_func_return
+  saving_func_return wrapper __aeabi_d2f
 
 double_wrapper_section __aeabi_i2d
 saving_func wrapper __aeabi_i2d
   dcp_int2double_m r0,r1,r0
-  saving_func_return
+  saving_func_return wrapper __aeabi_i2d
 
 double_wrapper_section __aeabi_ui2d
 saving_func wrapper __aeabi_ui2d
   dcp_uint2double_m r0,r1,r0
-  saving_func_return
+  saving_func_return wrapper __aeabi_ui2d
 
 double_wrapper_section __aeabi_d2iz
 saving_func wrapper __aeabi_d2iz
 @ with truncation towards 0
   dcp_double2int_m r0,r0,r1
   // note: this works with either saved or not saved call as it is just a `bx lr`
-  saving_func_return
+  saving_func_return wrapper __aeabi_d2iz
 
 double_wrapper_section __aeabi_d2uiz
 saving_func wrapper __aeabi_d2uiz
 @ with truncation towards 0
   dcp_double2uint_m r0,r0,r1
-  saving_func_return
+  saving_func_return wrapper __aeabi_d2uiz
 
 // ============== COMPARISON FUNCTIONS ===============
 
@@ -445,20 +459,20 @@ saving_func wrapper __aeabi_dcmpun
   dcp_dcmp_m r0,r0,r1,r2,r3
   // extract unordered bit
   ubfx r0, r0, #28, #1
-  saving_func_return
+  saving_func_return wrapper __aeabi_dcmpun
 
 double_wrapper_section __aeabi_dcmp
 saving_func wrapper __aeabi_cdrcmple
   dcp_dcmp_m apsr_nzcv,r2,r3,r0,r1 // with arguments reversed
   bvs cmp_nan
-  saving_func_return
+  saving_func_return wrapper __aeabi_cdrcmple
 
 // these next two can be the same function in the absence of exceptions
 saving_func wrapper __aeabi_cdcmple
 //wrapper_func __aeabi_dcmp
   dcp_dcmp_m apsr_nzcv,r0,r1,r2,r3
   bvs cmp_nan
-  saving_func_return
+  saving_func_return wrapper __aeabi_cdcmple
 
 // It is not clear from the ABI documentation whether cdcmpeq must set the C flag
 // in the same way as cdcmple. If not, we could save the "bvs" below; but we
@@ -467,7 +481,7 @@ saving_func wrapper __aeabi_cdcmpeq
 //wrapper_func __aeabi_dcmp
   dcp_dcmp_m apsr_nzcv,r0,r1,r2,r3
   bvs cmp_nan
-  saving_func_return
+  bx lr
 
 // If the result of a flag-setting comparison is "unordered" then we need to set C and clear Z.
 // We could conceivably just do lsrs r12,r14,#1, or even cmp r14,r14,lsr#1 as (a) r14 here is a
@@ -475,7 +489,8 @@ saving_func wrapper __aeabi_cdcmpeq
 cmp_nan:
   movs r12, #3 // r12 does not need to be preserved by the flag-setting comparisons
   lsrs r12, #1 // set C, clear Z
-  saving_func_return
+  // the end of __aeabi_cdcmpeq, which takes this tail in (as cdrcmple and cdcmple branch to it)
+  saving_func_return wrapper __aeabi_cdcmpeq
 
 // int FUNC_NAME(__aeabi_dcmpeq)(double, double)         result (1, 0) denotes (=, ?<>) [2], use for C == and !=
 double_wrapper_section __aeabi_dcmpeq
@@ -483,7 +498,7 @@ saving_func wrapper __aeabi_dcmpeq
   dcp_dcmp_m r0,r0,r1,r2,r3
   // extract Z
   ubfx r0, r0, #30, #1
-  saving_func_return
+  saving_func_return wrapper __aeabi_dcmpeq
 
 // int FUNC_NAME(__aeabi_dcmplt)(double, double)         result (1, 0) denotes (<, ?>=) [2], use for C <
 double_wrapper_section __aeabi_dcmplt
@@ -492,7 +507,7 @@ saving_func wrapper __aeabi_dcmplt
   ite hi
   movhi r0,#1
   movls r0,#0
-  saving_func_return
+  saving_func_return wrapper __aeabi_dcmplt
 
 // int FUNC_NAME(__aeabi_dcmple)(double, double)         result (1, 0) denotes (<=, ?>) [2], use for C <=
 double_wrapper_section __aeabi_dcmple
@@ -501,7 +516,7 @@ saving_func wrapper __aeabi_dcmple
   ite hs
   movhs r0,#1
   movlo r0,#0
-  saving_func_return
+  saving_func_return wrapper __aeabi_dcmple
 
 // int FUNC_NAME(__aeabi_dcmpge)(double, double)         result (1, 0) denotes (>=, ?<) [2], use for C >=
 double_wrapper_section __aeabi_dcmpge
@@ -510,7 +525,7 @@ saving_func wrapper __aeabi_dcmpge
   ite hs
   movhs r0,#1
   movlo r0,#0
-  saving_func_return
+  saving_func_return wrapper __aeabi_dcmpge
 
 // int FUNC_NAME(__aeabi_dcmpgt)(double, double)         result (1, 0) denotes (>, ?<=) [2], use for C >
 double_wrapper_section __aeabi_dcmpgt
@@ -519,4 +534,4 @@ saving_func wrapper __aeabi_dcmpgt
   ite hi
   movhi r0,#1
   movls r0,#0
-  saving_func_return
+  saving_func_return wrapper __aeabi_dcmpgt

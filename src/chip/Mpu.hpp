@@ -22,7 +22,7 @@
 //     SRAM above them           read/write, no execute
 //
 // .ramExec holds code written at run time (the bootrom's XIP setup function, rp_common/XipControl.hpp
-// FlashXipDisabler; anything else via [[KVASIR_SECTION_MEMBER(".ramExec")]]).
+// Flash::XipDisabler; anything else via [[KVASIR_SECTION_MEMBER(".ramExec")]]).
 //
 // Everything else keeps the default memory map (PRIVDEFENA). Privileged code only; HardFault and
 // NMI run with the MPU off (HFNMIENA = 0); DMA and the debugger are not checked. Core 0 only.

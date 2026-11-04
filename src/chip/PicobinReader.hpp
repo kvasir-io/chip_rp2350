@@ -610,13 +610,20 @@ namespace Kvasir { namespace Picobin {
         };
 
         /// `rules`: the ROM revision and OTP settings; `partitionTables`: whether PARTITION_TABLE blocks count as
-        /// such (the flash scan; a partition's own search does not look for them, dont_scan_for_partition_tables).
+        /// such (the flash scan; a partition's own search does not look for them, dont_scan_for_partition_tables);
+        /// `hashImageDef`: whether the IMAGE_DEF's hash is checked - which reads every load map entry's source, the
+        /// whole image. False for a reader that wants the partition table only: the walk and every choice in it are
+        /// the same, the IMAGE_DEF's hash comes out `unchecked` (none without a HASH_VALUE), and the reads end with
+        /// the loop. A firmware reading its own table in a main-loop turn takes that: a software SHA-256 over an
+        /// image is tens of ms in a release build and the better part of a second in a checked one.
         constexpr explicit Walker(Window    window,
                                   BootRules rules           = {},
-                                  bool      partitionTables = true)
+                                  bool      partitionTables = true,
+                                  bool      hashImageDef    = true)
           : window_{window}
           , rules_{rules}
           , partitionTables_{partitionTables}
+          , hashImageDef_{hashImageDef}
           , windowWords_{window.bytes / 4U}
           , nextRead_{window.searchStart / 4U}
           , firstMax_{std::min(window.bytes / 4U,
@@ -720,6 +727,7 @@ namespace Kvasir { namespace Picobin {
         Window    window_;
         BootRules rules_;
         bool      partitionTables_;
+        bool      hashImageDef_;
         // The ROM's buffer, its 160 words and two more: the end marker test reads 2 words past a LAST item at the
         // buffer's last word. What the ROM reads there is its workarea's next words; kept as zero here.
         std::array<std::uint32_t, blockBufferWords + 2U> buffer_{};
@@ -798,6 +806,10 @@ namespace Kvasir { namespace Picobin {
             }
             if(!image_ || image_->hashValueAt == 0U) {
                 phase_ = Phase::done;
+                return;
+            }
+            if(!hashImageDef_) {   // the table only: the IMAGE_DEF's hash is not read for
+                endUnchecked();
                 return;
             }
             if(!image_->block.hashDef
@@ -910,11 +922,16 @@ namespace Kvasir { namespace Picobin {
                     endUnchecked();
                     return;
                 }
+                // An empty source: nothing to hash, the next entry in this loop. Its first read set up here, not by
+                // nextHashRead() - which comes back here at an entry's end: a call each way would be a recursion one
+                // level per empty entry (up to 127) in cmake/tools/stack_bound.py's call graph.
+                if(size == 0U) { continue; }
                 entryFrom_  = from - window_.xipAddress;
                 entryBytes_ = size;
                 hashed_     = 0U;
                 ++entry_;
-                nextHashRead();
+                readAt_    = entryFrom_;
+                readBytes_ = std::min(maxReadBytes, entryBytes_);
                 return;
             }
             endHash(true);
@@ -1101,15 +1118,22 @@ namespace Kvasir { namespace Picobin {
         /// `flashBytes`: the flash's size (the default leaves it to the first short feed); `rules`: ROM revision and
         /// OTP (slot size, SINGLE_FLASH_BINARY, ...); `flashUpdateOffset`: the flash offset a FLASH_UPDATE boot names,
         /// if one does (ignored with DISABLE_WATCHDOG_SCRATCH: the boot ROM never sees it).
+        /// `hashImageDefs`: as Walker's `hashImageDef`, for both slots' loops - false for a reader that wants the
+        /// partition table only. The choice between the slots is the same as long as slot 0 holds a PARTITION_TABLE;
+        /// a slot 0 without one decides alone only with a verified IMAGE_DEF, which an unchecked one is not, so slot 1
+        /// is searched then.
         constexpr explicit FlashWalker(std::uint32_t                flashBytes = 0xffff'fffcU,
                                        BootRules                    rules      = {},
                                        std::optional<std::uint32_t> flashUpdateOffset
-                                       = std::nullopt)
+                                       = std::nullopt,
+                                       bool hashImageDefs = true)
           : rules_{rules}
           , flashUpdate_{rules.watchdogScratchDisabled ? std::nullopt : flashUpdateOffset}
+          , hashImageDefs_{hashImageDefs}
           , slot0_{Window{.bytes = flashBytes},
                    rules,
-                   !rules.singleFlashBinary} {
+                   !rules.singleFlashBinary,
+                   hashImageDefs} {
             settle();
         }
 
@@ -1152,6 +1176,7 @@ namespace Kvasir { namespace Picobin {
 
         BootRules                    rules_;
         std::optional<std::uint32_t> flashUpdate_;
+        bool                         hashImageDefs_;
         Walker                       slot0_;
         Walker                       slot1_{Window{.bytes = 0U}};   // searched once slot 0 is done
         bool                         slot1Searched_{};
@@ -1180,7 +1205,8 @@ namespace Kvasir { namespace Picobin {
                 slot1_ = Walker{
                   Window{.bytes = slot0_.window().bytes, .searchStart = rules_.slotSize},
                   rules_,
-                  !rules_.singleFlashBinary
+                  !rules_.singleFlashBinary,
+                  hashImageDefs_
                 };
                 slot1Searched_ = true;
                 state_         = State::slot1;

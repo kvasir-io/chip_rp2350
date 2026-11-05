@@ -271,7 +271,7 @@ def main(argv=None):
         image.solve()
         if a.elf:
             shutil.copy(elf, a.elf)
-    report = {'rom': str(a.rom), 'sha256': hashlib.sha256(rom).hexdigest(), 'version': rom[0x13],
+    report = {'rom': str(a.rom), 'sha256': hashlib.sha256(rom).hexdigest(), 'rom_version': rom[0x13],
               'functions': len(starts), 'data_ranges': len(data), 'entries': {}}
     print(
         f'{a.rom}: ROM version {rom[0x13]}, sha256 {report["sha256"]}, {len(starts)} functions reached')

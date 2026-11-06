@@ -970,7 +970,8 @@ void walkerAgainstMemory() {
         auto const pieces = walkInPieces(bytes, true, rng, rules);
         check(whole.outcome() == pieces.outcome() && whole.imageDef() == pieces.imageDef()
                 && whole.partitionTable() == pieces.partitionTable()
-                && whole.firstBlock() == pieces.firstBlock(),
+                && whole.firstBlock() == pieces.firstBlock()
+                && whole.footprint() == pieces.footprint(),
               "Walker in pieces = the walk over memory");
         if(auto const def = whole.imageDef()) {
             ++launched;
@@ -981,6 +982,247 @@ void walkerAgainstMemory() {
     }
     std::printf("walker: 20000 loops, %d with an IMAGE_DEF launched\n", launched);
     check(launched > 2000, "the generator makes enough launchable loops");
+}
+
+// The secp256k1 generator G as a public key (the key of private key 1, SEC 2 2.4.1): X then Y, big endian, as the
+// SIGNATURE item's words hold the bytes. SHA-256 of its 64 bytes, by Python's hashlib:
+// hashlib.sha256(bytes.fromhex(Gx + Gy)).hexdigest().
+constexpr std::array<std::uint32_t, 16> generatorKey{0x7e66'be79U,
+                                                     0xacbb'dcf9U,
+                                                     0x9562'a055U,
+                                                     0x070b'87ceU,
+                                                     0xdbfc'9b02U,
+                                                     0xd928'ce2dU,
+                                                     0x5b81'f259U,
+                                                     0x9817'f816U,
+                                                     0x77da'3a48U,
+                                                     0x65c4'a326U,
+                                                     0xfcfb'a45dU,
+                                                     0xa808'110eU,
+                                                     0x48b4'17fdU,
+                                                     0x1954'85a6U,
+                                                     0x8fd0'479cU,
+                                                     0xb8d4'10fbU};
+constexpr std::string_view              generatorKeyHash
+  = "09c0b2d1a486c439a87bcba6b46a7a1a23f3897cc83a94521a96da5c23bc58db";
+
+/// IMAGE_TYPE and a SIGNATURE item of type `sigType` with `key` and a signature of `sigWord`s.
+std::vector<std::uint32_t> signedItems(std::uint32_t         first,
+                                       std::array<std::uint32_t,
+                                                  16> const& key,
+                                       std::uint32_t         sigType = 1U,
+                                       std::uint32_t         sigWord = 0U) {
+    std::vector<std::uint32_t> items{first, 0x0000'2109U | (sigType << 24U)};
+    items.insert(items.end(), key.begin(), key.end());
+    items.insert(items.end(), 16U, sigWord);
+    return items;
+}
+
+/// The 32 numbers of `"bootkey0": [...]` in picotool's OTP json.
+std::vector<std::byte> bootkey0(std::vector<std::byte> const& json) {
+    std::string text(json.size(), '\0');
+    std::ranges::transform(json, text.begin(), [](std::byte b) { return static_cast<char>(b); });
+    std::vector<std::byte> out;
+    auto                   at = text.find('[', text.find("\"bootkey0\""));
+    while(at != std::string::npos && text[at] != ']' && out.size() < 64U) {
+        auto const digit = text.find_first_of("0123456789]", at + 1U);
+        if(digit == std::string::npos || text[digit] == ']') { break; }
+        std::size_t used{};
+        out.push_back(static_cast<std::byte>(std::stoul(text.substr(digit), &used)));
+        at = digit + used;
+    }
+    return out;
+}
+
+void signerKeys() {
+    // picotool seal --sign with a throwaway key (data/README.md): the key's hash is what picotool's OTP json programs
+    // into BOOTKEY0, and what openssl makes of the key file (the README's command)
+    auto const signedImage = readFile("tiny_signed.bin");
+    auto const def         = Pb::launchedImageDef(signedImage);
+    auto const otp         = bootkey0(readFile("tiny_signed_otp.json"));
+    check(otp.size() == 32U, "tiny_signed_otp.json: 32 bootkey0 bytes");
+    check(def.has_value() && def->offset == 0x400U && def->signature && def->verified()
+            && def->hash == Pb::ParsedBlock::Hash::ok,
+          "signed: picotool's IMAGE_DEF at 0x400, its hash holds");
+    if(def && def->signerKeyHash) {
+        check(hex(*def->signerKeyHash)
+                == "5207883500a9125a87ba9253076976d02455bba275a1ca5d5267c356344cb5bc",
+              "signed: the signer's key hash is SHA-256 of the key's X||Y (openssl, picotool)");
+        check(std::ranges::equal(*def->signerKeyHash, otp),
+              "signed: the signer's key hash is picotool's bootkey0");
+    } else {
+        check(false, "signed: a signer's key hash");
+    }
+    auto const secured
+      = Pb::walk(signedImage, Pb::Window{}, Pb::BootRules{.secure = true}).imageDef();
+    check(secured.has_value() && secured->hash == Pb::ParsedBlock::Hash::unchecked
+            && secured->signerKeyHash == def.value_or(Pb::ParsedBlock{}).signerKeyHash,
+          "signed, on a secured chip: the signature unchecked, the key hash the same");
+    std::mt19937 rng{11U};
+    for(int i = 0; i < 20; ++i) {
+        check(walkInPieces(signedImage, (i % 2) == 0, rng).imageDef() == def,
+              "signed, read in pieces: the same IMAGE_DEF and key hash");
+    }
+    check(!Pb::launchedImageDef(readFile("tiny_sealed.bin"))
+             .value_or(Pb::ParsedBlock{})
+             .signerKeyHash.has_value(),
+          "sealed with a hash only: no signer");
+
+    // a block made here around a key whose hash Python computed: the 16 words after the header, nothing else
+    {
+        Image img{64};
+        img.block(0, signedItems(armExe, generatorKey), 0);
+        auto const key
+          = Pb::launchedImageDef(img.bytes()).value_or(Pb::ParsedBlock{}).signerKeyHash;
+        check(key.has_value() && hex(key.value_or(std::array<std::byte, 32>{})) == generatorKeyHash,
+              "the key G: SHA-256 of its X||Y");
+        Image otherSig{64};
+        otherSig.block(0, signedItems(armExe, generatorKey, 1U, 0x5a5a'5a5aU), 0);
+        check(Pb::launchedImageDef(otherSig.bytes()).value_or(Pb::ParsedBlock{}).signerKeyHash
+                == key,
+              "another signature, the same key: the same hash");
+        auto flipped = generatorKey;
+        flipped[15] ^= 1U;
+        Image otherKey{64};
+        otherKey.block(0, signedItems(armExe, flipped), 0);
+        auto const other = Pb::launchedImageDef(otherKey.bytes()).value_or(Pb::ParsedBlock{});
+        check(other.signerKeyHash.has_value() && other.signerKeyHash != key,
+              "a bit of Y changed: another hash");
+        Image notSecp{64};
+        notSecp.block(0, signedItems(armExe, generatorKey, 2U), 0);
+        auto const unknown = Pb::launchedImageDef(notSecp.bytes()).value_or(rejectedBlock);
+        check(!unknown.rejected && !unknown.signature && !unknown.signerKeyHash,
+              "a signature type the ROM does not know: no signature, no key");
+        // a PARTITION_TABLE's signer the same way (SECURE_PARTITION_TABLE): no partitions, the unpartitioned word
+        std::vector<std::uint32_t> tableItems{0x0000'020aU, 0xfc00'0000U, 0x0100'2109U};
+        tableItems.insert(tableItems.end(), generatorKey.begin(), generatorKey.end());
+        tableItems.insert(tableItems.end(), 16U, 0U);
+        Image table{64};
+        table.block(0, tableItems, 0);
+        auto const tableKey = Pb::walk(table.bytes()).partitionTableBlock().value_or(rejectedBlock);
+        check(tableKey.partitionTable && !tableKey.rejected && tableKey.signerKeyHash == key,
+              "a PARTITION_TABLE's signer");
+    }
+}
+
+// The same at compile time: a block with G's key read back in a constant expression.
+constexpr auto generatorSigned = [] {
+    std::array<std::uint32_t, 38> words{};
+    words[0] = Pb::picobinBlockMarkerStart;
+    words[1] = armExe;
+    words[2] = 0x0100'2109U;   // SIGNATURE secp256k1, 33 words
+    for(std::size_t i = 0; i < 16U; ++i) { words[3U + i] = generatorKey[i]; }
+    words[35] = 0x0000'22ffU;   // LAST: 34 words of items
+    words[36] = 0U;             // linked to itself
+    words[37] = Pb::picobinBlockMarkerEnd;
+    return Pb::asBytes(words);
+}();
+static_assert(Pb::launchedImageDef(generatorSigned)
+                .value_or(Pb::ParsedBlock{})
+                .signerKeyHash.value_or(std::array<std::byte,
+                                                   32>{})[0]
+              == std::byte{0x09});
+static_assert(Pb::launchedImageDef(generatorSigned)
+                .value_or(Pb::ParsedBlock{})
+                .signerKeyHash.value_or(std::array<std::byte,
+                                                   32>{})[31]
+              == std::byte{0xdb});
+
+void footprints() {
+    using F = Pb::Footprint;
+    // picotool's sealed and signed images: the appended block ends the file, the load map starts at its byte 0
+    for(auto const* name :
+        {"tiny_sealed.bin", "tiny_signed.bin", "blink_sealed.bin", "copy_to_ram_sealed.bin"})
+    {
+        auto const bytes = readFile(name);
+        auto const size  = static_cast<std::uint32_t>(bytes.size());
+        check(Pb::walk(bytes).footprint() == std::optional{F{.first = 0U, .end = size, .loadMap = true}},
+              std::string{name} + ": the footprint is the whole file");
+        // without the hash: the same, from the loop's reads alone
+        Pb::Walker  walker{Pb::Window{.bytes = size}, Pb::BootRules{}, false, false};
+        std::size_t read{};
+        while(auto const want = walker.want()) {
+            auto const [at, length] = *want;
+            auto const from         = std::min<std::size_t>(at, bytes.size());
+            auto const piece
+              = std::span{bytes}.subspan(from, std::min<std::size_t>(length, bytes.size() - from));
+            read += piece.size();
+            walker.feed(piece);
+        }
+        check(walker.footprint() == Pb::walk(bytes).footprint()
+                && walker.imageDef().value_or(Pb::ParsedBlock{}).hash
+                     == Pb::ParsedBlock::Hash::unchecked,
+              std::string{name} + ": the footprint without the hash");
+        if(size > 4096U) {
+            check(read < size / 2U, std::string{name} + ": and without reading the image");
+        }
+    }
+    {
+        // the same picotool image as partition A of the provisioned layout (4 KiB on): its absolute load map rolls by
+        // the partition's XIP address, the footprint is relative to the partition
+        auto const             blink = readFile("blink_sealed.bin");
+        std::vector<std::byte> flash(std::size_t{0x1000} + blink.size(), std::byte{0xff});
+        std::ranges::copy(blink, flash.begin() + 0x1000);
+        auto const inA = Pb::walk(std::span{flash}.subspan(0x1000),
+                                  Pb::Window{.xipAddress = Pb::xipBaseAddress + 0x1000U},
+                                  {},
+                                  false);
+        check(inA.footprint() == Pb::walk(blink).footprint()
+                && inA.imageDef().value_or(rejectedBlock).verified(),
+              "blink in a partition at 4 KiB: the same footprint, from the partition start");
+    }
+    // a flash image without a load map: only its block, not the vector table in front of it
+    Image unsealed{256};
+    unsealed.block(0x40, {armExe}, 0);
+    check(Pb::walk(unsealed.bytes()).footprint()
+            == std::optional{F{.first = 0x100U, .end = 0x114U, .loadMap = false}},
+          "no load map: the block alone");
+    // ROLLING_WINDOW_DELTA: the absolute load map's 0x10000000 is the window's byte delta. One entry, 2 KiB from
+    // 0x10000000; the block at 0x40.
+    auto const rolled = [](std::uint32_t delta) {
+        Image img{0x1000};   // 16 KiB
+        img.block(0x10,
+                  {armExe,
+                   0x0000'0205U,
+                   delta,   // ROLLING_WINDOW_DELTA
+                   0x8100'0406U,
+                   0x1000'0000U,
+                   0x1000'0000U,
+                   0x1000'0800U},   // LOAD_MAP absolute, one entry
+                  0);
+        auto const bytes = img.bytes();
+        return Pb::walk(bytes).footprint();
+    };
+    check(rolled(0U) == std::optional{F{.first = 0U, .end = 0x800U, .loadMap = true}},
+          "no delta: the source from byte 0, the block inside it");
+    check(rolled(0x2000U)
+            == std::optional{F{.first = 0x40U, .end = 0x2800U, .loadMap = true}},
+          "delta 8 KiB: the source from byte 0x2000, the block before it");
+    check(!rolled(0x4000U).has_value(),
+          "a delta that puts the source past the window: the ROM refuses it, no footprint");
+    // a slot 1 search (from 4 KiB on, the whole flash its window): 0x10000000 is the search start
+    {
+        Image img{0x1000};
+        img.block(0x400 + 0x10,
+                  {armExe, 0x8100'0406U, 0x1000'0000U, 0x1000'0000U, 0x1000'0800U},
+                  0);
+        auto const bytes = img.bytes();
+        check(Pb::walk(bytes,
+                       Pb::Window{
+                         .searchStart = 0x1000U
+        })
+                  .footprint()
+                == std::optional{F{.first = 0x1000U, .end = 0x1800U, .loadMap = true}},
+              "slot 1: the load map from the search start");
+    }
+    // a relative entry whose source runs out of the window: refused (a storage address of 0 would be a zero fill)
+    {
+        Image img{64};
+        img.block(0, {armExe, 0x0100'0406U, 4U, 0x1000'0000U, 0x400U}, 0);
+        check(!Pb::walk(img.bytes()).footprint().has_value(),
+              "a source past the window: no footprint");
+        check(!Pb::walk(Image{64}.bytes()).footprint().has_value(), "no block: no footprint");
+    }
 }
 }   // namespace
 
@@ -998,6 +1240,8 @@ int main() {
     romEdges();
     parser();
     walkerAgainstMemory();
+    signerKeys();
+    footprints();
     std::printf("reader: %d checks, %d failed\n", checks, failures);
     return failures == 0 ? 0 : 1;
 }

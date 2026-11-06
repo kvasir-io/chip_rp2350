@@ -11,6 +11,7 @@
 // - Walker: one window (a partition, or flash from a slot on) - its block_scan_t, s_varm_crit_next_block
 //   (varm_blocks.c) with the loop of s_varm_crit_search_window (varm_flash_boot.c), s_varm_crit_parse_block
 //   (Detail::parse), then s_varm_crit_ram_trash_verify_block in place (the hash, the load map's reads included).
+//   footprint(): the bytes the launched image takes up (its loop and its load map's sources), without the hash.
 // - chooseAb: s_varm_crit_choose_by_tbyb_flash_update_boot_and_version - partition A or B by verification, TBYB,
 //   flash update boot and version, and which first sector a buy erases (the version downgrade).
 // - FlashWalker: s_varm_crit_ram_trash_pick_boot_slot - slot 0 at flash byte 0, slot 1 at the slot size unless slot 0
@@ -48,8 +49,9 @@
 //   (HASH_DEF; N is 8 bits) with the IMAGE_DEF's TBYB bit cleared; HASH_VALUE's 1..8 words are the digest's first
 //   words. An entry the ROM refuses (unaligned, outside the window, a runtime range neither RAM nor XIP) fails it.
 // Not modelled: the ECDSA (secp256k1) check of a signature and the signing-key match on a secured chip (such a block's
-// hash is `unchecked`), the OTP rollback rows' value, a FLASH_DEVINFO-sized window (pass the flash's bytes), RISC-V
-// boots, and RP2350-E17/E18 (an A2/A3 ROM faulting on a bad ECC pair in the slot size rows).
+// hash is `unchecked`; the key match is the caller's, against OTP's BOOTKEYn: ParsedBlock::signerKeyHash), the OTP
+// rollback rows' value, a FLASH_DEVINFO-sized window (pass the flash's bytes), RISC-V boots, and RP2350-E17/E18 (an
+// A2/A3 ROM faulting on a bad ECC pair in the slot size rows).
 #include "picobin.hpp"
 
 #include <algorithm>
@@ -249,7 +251,17 @@ namespace Kvasir { namespace Picobin {
         std::optional<Version> version;    ///< a VERSION item
         std::uint16_t rollbackVersion{};   ///< VERSION's rollback version; 0 without OTP rows
         bool signature{};   ///< a secp256k1 SIGNATURE item, the only kind the boot ROM checks
-        bool hashDef{};     ///< a SHA-256 HASH_DEF item, the only kind the boot ROM uses
+        /// The signer's key as OTP knows it: SHA-256 of the secp256k1 SIGNATURE item's public key. The item (RP2350
+        /// datasheet 5.9.2.4) is the header, 16 words of public key, 16 of signature; picotool writes the key as X then
+        /// Y, 32 bytes each, big endian (mbedtls_mpi_write_binary), and the digest is over those 64 bytes as flash
+        /// holds them - what the boot ROM hashes (s_varm_crit_is_signing_key_match) and compares with each valid
+        /// BOOTKEYn (16 OTP rows: the digest's bytes 2k, 2k+1 in row k, low byte first). picotool seal --sign writes
+        /// the same digest as its OTP json's `bootkey0`, and SHA-256 of the key file's last 64 DER bytes is it too. So
+        /// whether a block is signed with a key a chip accepts is decided without ECDSA: a valid BOOTKEYn equal to
+        /// this; whether the signature holds is not (see the header). nullopt without a secp256k1 SIGNATURE item; of
+        /// several the last counts, as in the ROM.
+        std::optional<std::array<std::byte, 32>> signerKeyHash;
+        bool hashDef{};   ///< a SHA-256 HASH_DEF item, the only kind the boot ROM uses
         /// The parser would not use it (bad_item, see the header): chosen only when nothing came before it, and then
         /// not booted.
         bool rejected{};
@@ -508,6 +520,16 @@ namespace Kvasir { namespace Picobin {
                         out.signatureWord
                           = word
                           + 16U;   // the ROM adds a per-boot value to it (CTAG_SIG_DISRUPTER)
+                        // the public key's 16 words, hashed as the ROM hashes them (sb_sha256_update_32 over
+                        // the buffer: each word's bytes as flash holds them). A key that runs past LAST is the
+                        // block's end - the item does too, and the block is rejected below.
+                        if(word + 16U <= last) {
+                            Sha256 key{};
+                            for(std::uint32_t i = 0; i < 16U; ++i) {
+                                key.updateWord(block[word + i]);
+                            }
+                            b.signerKeyHash = key.finish();
+                        }
                     }
                 } else if(type == code(ItemType::version)) {
                     // 5.9.2.1: 2 + ((rows != 0) + rows + 1) / 2 words; word 2 the rollback version (low half) and
@@ -591,6 +613,16 @@ namespace Kvasir { namespace Picobin {
         std::uint32_t bytes{0xffff'fffcU};
         std::uint32_t xipAddress{xipBaseAddress};
         std::uint32_t searchStart{};
+    };
+
+    /// The bytes of a window an image takes up, [first, end) from the window start (Walker::footprint()).
+    struct Footprint {
+        std::uint32_t first{};
+        std::uint32_t end{};
+        /// The IMAGE_DEF has a LOAD_MAP: its sources are in the range. Without one only the block loop is.
+        bool loadMap{};
+
+        constexpr bool operator==(Footprint const&) const = default;
     };
 
     /// The boot ROM's walk of one window for a reader that gets the bytes a piece at a time and maybe asynchronously:
@@ -718,7 +750,102 @@ namespace Kvasir { namespace Picobin {
                 && (table_->words[1] & Detail::ptSingleton) != 0U;
         }
 
+        /// Once done: the bytes of the window the image of imageDef() takes up as the boot ROM reads it - which sectors
+        /// it occupies. Taken from the blocks alone, nothing read or hashed for it: a walk without the image's hash
+        /// (`hashImageDef` false, the loop's few reads) has it too. The smallest range [first, end) from the window
+        /// start that holds
+        /// - the block loop: every block of it, from its start marker to its end marker (the loop's PARTITION_TABLE
+        ///   block too, if there is one);
+        /// - each LOAD_MAP entry's source - what the ROM copies and hashes: a relative entry's from the LOAD_MAP item
+        ///   on, an absolute one's as the ROM translates it, the runtime address 0x10000000 at the window's byte
+        ///   searchStart + ROLLING_WINDOW_DELTA (what the launch's rolling window maps there). A zero fill has none.
+        /// nullopt for no IMAGE_DEF (imageDef()) and for a load map entry the ROM refuses (a runtime range unaligned or
+        /// neither RAM nor XIP, a source unaligned or outside the window: verify_fail, nothing launches). For an
+        /// IMAGE_DEF that is not verified() it is what the parser recorded. An image without a LOAD_MAP (`loadMap`
+        /// false) names no bytes besides its blocks: a flash image run in place, unsealed, has a vector table in front
+        /// of its first block and its code after it that the range need not cover.
+        [[nodiscard]] constexpr std::optional<Footprint> footprint() const {
+            if(!done() || outcome_ != Outcome::closed || !image_) { return std::nullopt; }
+            Footprint out{.first = loopFirst_, .end = loopEnd_, .loadMap = image_->loadMapAt != 0U};
+            for(std::uint32_t i = 0; i < loadMapEntries(*image_); ++i) {
+                auto const entry = loadMapEntry(*image_, i);
+                if(entry.kind == LoadMapEntry::Kind::refused) { return std::nullopt; }
+                if(entry.kind == LoadMapEntry::Kind::zeroFill || entry.size == 0U) { continue; }
+                // a size no multiple of 4 (A2/A3 take it): the ROM reads the last word whole
+                out.first = std::min(out.first, entry.from);
+                out.end   = std::max(out.end, entry.from + ((entry.size + 3U) & ~3U));
+            }
+            return out;
+        }
+
     private:
+        /// One load map entry as s_varm_crit_ram_trash_verify_block resolves it, before anything is read.
+        struct LoadMapEntry {
+            enum class Kind : std::uint8_t {
+                refused,   ///< the ROM's verify_fail: an invalid runtime range, a source outside the window
+                zeroFill,   ///< `size` is the word the ROM hashes for it
+                source,     ///< `size` bytes from `from` (bytes from the window start)
+                /// a source whose size is no multiple of 4 (A2/A3; A4 refuses it): see ParsedBlock::Hash::unchecked
+                oddSource,
+            };
+            Kind          kind{Kind::refused};
+            std::uint32_t from{};
+            std::uint32_t size{};
+        };
+
+        /// The LOAD_MAP's entry count (bits 24..30 of its header), 0 without one.
+        [[nodiscard]] static constexpr std::uint32_t loadMapEntries(Detail::Parsed const& p) {
+            return p.loadMapAt == 0U ? 0U : (p.words[p.loadMapAt] << 1U) >> 25U;
+        }
+
+        /// Entry `index` of `p`'s LOAD_MAP: its checks, a zero fill's size word, where its source is.
+        [[nodiscard]] constexpr LoadMapEntry loadMapEntry(Detail::Parsed const& p,
+                                                          std::uint32_t         index) const {
+            bool const rel
+              = p.loadMapAt != 0U && static_cast<std::int32_t>(p.words[p.loadMapAt]) >= 0;
+            auto const roll
+              = window_.xipAddress + window_.searchStart - xipBaseAddress + p.rollingDelta;
+            auto const    at      = p.loadMapAt + 1U + (3U * index);
+            auto const    storage = p.words[at];
+            auto const    vma     = p.words[at + 1U];
+            std::uint32_t size    = p.words[at + 2U];
+            std::uint32_t to      = vma;
+            if(vma < xipBaseAddress + (16U * 1024U * 1024U)) { to += roll; }
+            if(!rel) { size -= vma; }
+            auto const toEnd = to + size;
+            // A4 refuses a size that is no multiple of 4 ("A2/A3 had a bug"); A2/A3 take it
+            bool const a4    = rules_.rom >= RomVersion::a4;
+            bool const valid = (to & 3U) == 0U && (!a4 || (size & 3U) == 0U)
+                            && (Detail::isSramOrXipRam(to) || Detail::isXip(to))
+                            && (Detail::isSramOrXipRam(toEnd - (size != 0U ? 1U : 0U))
+                                || Detail::isXip(toEnd - (size != 0U ? 1U : 0U)))
+                            && ((toEnd - to) >> 27U) == 0U;
+            if(!valid) { return {}; }
+            if(storage
+               == 0U) {   // zero fill: the ROM hashes its size (A2/A3: rounded up to a word)
+                return {.kind = LoadMapEntry::Kind::zeroFill,
+                        .size = a4 ? size : (size + 3U) & ~3U};
+            }
+            // the source, as an XIP address and then as bytes from the window start
+            std::uint32_t from = storage;
+            if(!rel) {
+                if(!Detail::isSramOrXipRam(from)) { from += roll; }
+            } else {
+                from = storage + window_.xipAddress + p.block.offset + (4U * p.loadMapAt);
+            }
+            auto const windowEnd
+              = std::uint64_t{window_.xipAddress} + (std::uint64_t{windowWords_} * 4U);
+            if((from & 3U) != 0U || from < window_.xipAddress
+               || std::uint64_t{from} + size >= windowEnd || from + size < from)
+            {
+                return {};
+            }
+            return {.kind = (size & 3U) != 0U ? LoadMapEntry::Kind::oddSource
+                                              : LoadMapEntry::Kind::source,
+                    .from = from - window_.xipAddress,
+                    .size = size};
+        }
+
         static constexpr std::uint32_t noFirst
           = 0xffff'ffffU;   // the ROM's first block offset -1, compared unsigned
 
@@ -744,8 +871,11 @@ namespace Kvasir { namespace Picobin {
         Phase                                            phase_{Phase::walk};
         std::uint32_t                                    readAt_{};
         std::uint32_t                                    readBytes_{};
-        std::optional<Detail::Parsed>                    image_;
-        std::optional<Detail::Parsed>                    table_;
+        // the loop's extent so far (footprint()): the lowest block start, the furthest block end
+        std::uint32_t                 loopFirst_{0xffff'ffffU};
+        std::uint32_t                 loopEnd_{};
+        std::optional<Detail::Parsed> image_;
+        std::optional<Detail::Parsed> table_;
         // the image's hash, in flight: the load map entry and how far into its source
         Sha256        sha_{};
         std::uint32_t entry_{};
@@ -760,6 +890,9 @@ namespace Kvasir { namespace Picobin {
         /// s_varm_crit_search_window's part, for each block next_block returns.
         constexpr void take(std::uint32_t last,
                             std::int64_t  nextOffset) {
+            // the block from its start marker (the buffer's word 0) to its end marker: LAST, the link, the marker
+            loopFirst_ = std::min(loopFirst_, bufStart_ * 4U);
+            loopEnd_   = std::max(loopEnd_, (bufStart_ + last + 3U) * 4U);
             ++blocks_;
             if(rules_.rom == RomVersion::a2) {
                 // no limit in A2: a loop longer than the window has block starts revisits one and never ends
@@ -873,61 +1006,27 @@ namespace Kvasir { namespace Picobin {
                 return;
             }
             auto const& p     = *image_;
-            auto const  count = p.loadMapAt == 0U ? 0U : (p.words[p.loadMapAt] << 1U) >> 25U;
-            bool const  rel
-              = p.loadMapAt != 0U && static_cast<std::int32_t>(p.words[p.loadMapAt]) >= 0;
-            auto const roll
-              = window_.xipAddress + window_.searchStart - xipBaseAddress + p.rollingDelta;
+            auto const  count = loadMapEntries(p);
             for(; entry_ < count; ++entry_) {
-                auto const    at      = p.loadMapAt + 1U + (3U * entry_);
-                auto const    storage = p.words[at];
-                auto const    vma     = p.words[at + 1U];
-                std::uint32_t size    = p.words[at + 2U];
-                std::uint32_t to      = vma;
-                if(vma < xipBaseAddress + (16U * 1024U * 1024U)) { to += roll; }
-                if(!rel) { size -= vma; }
-                auto const toEnd = to + size;
-                // A4 refuses a size that is no multiple of 4 ("A2/A3 had a bug"); A2/A3 take it
-                bool const a4    = rules_.rom >= RomVersion::a4;
-                bool const valid = (to & 3U) == 0U && (!a4 || (size & 3U) == 0U)
-                                && (Detail::isSramOrXipRam(to) || Detail::isXip(to))
-                                && (Detail::isSramOrXipRam(toEnd - (size != 0U ? 1U : 0U))
-                                    || Detail::isXip(toEnd - (size != 0U ? 1U : 0U)))
-                                && ((toEnd - to) >> 27U) == 0U;
-                if(!valid) {
+                auto const entry = loadMapEntry(p, entry_);
+                if(entry.kind == LoadMapEntry::Kind::refused) {
                     endHash(false);
                     return;
                 }
-                if(storage
-                   == 0U) {   // zero fill: the ROM hashes its size (A2/A3: rounded up to a word)
-                    sha_.updateWord(a4 ? size : (size + 3U) & ~3U);
+                if(entry.kind == LoadMapEntry::Kind::zeroFill) {
+                    sha_.updateWord(entry.size);
                     continue;
                 }
-                // the source, as an XIP address and then as bytes from the window start
-                std::uint32_t from = storage;
-                if(!rel) {
-                    if(!Detail::isSramOrXipRam(from)) { from += roll; }
-                } else {
-                    from = storage + window_.xipAddress + p.block.offset + (4U * p.loadMapAt);
-                }
-                auto const windowEnd
-                  = std::uint64_t{window_.xipAddress} + (std::uint64_t{windowWords_} * 4U);
-                if((from & 3U) != 0U || from < window_.xipAddress
-                   || std::uint64_t{from} + size >= windowEnd || from + size < from)
-                {
-                    endHash(false);
-                    return;
-                }
-                if((size & 3U) != 0U) {   // A2/A3 with a size no multiple of 4: see Hash::unchecked
+                if(entry.kind == LoadMapEntry::Kind::oddSource) {   // see Hash::unchecked
                     endUnchecked();
                     return;
                 }
                 // An empty source: nothing to hash, the next entry in this loop. Its first read set up here, not by
                 // nextHashRead() - which comes back here at an entry's end: a call each way would be a recursion one
                 // level per empty entry (up to 127) in cmake/tools/stack_bound.py's call graph.
-                if(size == 0U) { continue; }
-                entryFrom_  = from - window_.xipAddress;
-                entryBytes_ = size;
+                if(entry.size == 0U) { continue; }
+                entryFrom_  = entry.from;
+                entryBytes_ = entry.size;
                 hashed_     = 0U;
                 ++entry_;
                 readAt_    = entryFrom_;
@@ -1451,7 +1550,15 @@ namespace Kvasir { namespace Picobin {
         static_assert(launchedImageDef(minimumArm).value_or(ParsedBlock{}).hash
                       == ParsedBlock::Hash::none);
         static_assert(!launchedImageDef(minimumArm).value_or(ParsedBlock{}).tbyb);
+        static_assert(!launchedImageDef(minimumArm).value_or(ParsedBlock{}).signerKeyHash);
         static_assert(!partitionTable(minimumArm).has_value());
+        // its five words are all it takes up: no load map
+        static_assert(walk(minimumArm).footprint()
+                      == std::optional{
+                        Footprint{.first   = 0U,
+                                  .end     = 20U,
+                                  .loadMap = false}
+        });
 
         // TBYB and a VERSION item, in a two-block loop: the last executable IMAGE_DEF wins
         using Tbyb = ImageDef<ImageType::exe, ExeSecurity::s, ExeCpu::arm, ExeChip::rp2350, true>;
@@ -1465,6 +1572,12 @@ namespace Kvasir { namespace Picobin {
                       == std::optional{ParsedBlock::Version{.major = 2,
                                                             .minor = 5}});
         static_assert(launchedImageDef(twoBlocks).value_or(ParsedBlock{}).offset == 20U);
+        // the loop is both blocks, the launched one's included
+        static_assert(walk(twoBlocks).footprint()
+                      == std::optional{
+                        Footprint{.first = 0U,
+                                  .end   = static_cast<std::uint32_t>(twoBlocks.size())}
+        });
     }}   // namespace Detail::ReadBackTest
 
 }}   // namespace Kvasir::Picobin

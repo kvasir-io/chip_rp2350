@@ -16,6 +16,7 @@
 
 #include "kvasir/Port/LinkerSymbols.hpp"
 #include "kvasir/Register/Register.hpp"
+#include "kvasir/Util/BusAddress.hpp"
 #include "kvasir/Util/attributes.hpp"
 #include "peripherals/DMA.hpp"
 #include "peripherals/PSM.hpp"
@@ -84,7 +85,7 @@ struct CoreResetGuard {
     // After initMemory (the Startup list's runtimeInit): the routine is in RAM with .data. Armed through
     // Rp::WatchdogBoot::arm (SCRATCH4 last). The stack: the image's initial one - nothing on it outlives a reset.
     static void runtimeInit() {
-        auto const at = reinterpret_cast<std::uint32_t>(&entry) | 1U;   // Thumb
+        auto const at = Kvasir::busAddress(&entry) | 1U;   // Thumb
         Rp::WatchdogBoot::arm(at, static_cast<std::uint32_t>(Startup::PrimaryStackTop::value()));
     }
 

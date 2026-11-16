@@ -778,6 +778,34 @@ namespace Kvasir { namespace Picobin {
             return out;
         }
 
+        /// Once done: where the launch of imageDef() writes - the smallest runtime range [first, end) that holds every
+        /// LOAD_MAP entry's destination, copies and zero fills alike (an entry in place counts: the ROM hashes it
+        /// there), as s_varm_crit_ram_trash_verify_block resolves it (an XIP destination rolled as the source is). What
+        /// a caller checks before it hands the window to the boot ROM's chain_image, which copies the entries over RAM
+        /// before it verifies anything (the copy is in the hash, varm_blocks.c): that the copy cannot reach what still
+        /// has to run. nullopt for no IMAGE_DEF, no LOAD_MAP (nothing is copied: the image runs in place), an entry the
+        /// ROM refuses, or only empty entries.
+        [[nodiscard]] constexpr std::optional<Footprint> loadTargets() const {
+            if(!done() || outcome_ != Outcome::closed || !image_ || image_->loadMapAt == 0U) {
+                return std::nullopt;
+            }
+            std::optional<Footprint> out;
+            for(std::uint32_t i = 0; i < loadMapEntries(*image_); ++i) {
+                auto const entry = loadMapEntry(*image_, i);
+                if(entry.kind == LoadMapEntry::Kind::refused) { return std::nullopt; }
+                if(entry.size == 0U) { continue; }
+                // a size no multiple of 4 (A2/A3 take it): the ROM writes the last word whole
+                auto const end = entry.to + ((entry.size + 3U) & ~3U);
+                if(!out) {
+                    out = Footprint{.first = entry.to, .end = end, .loadMap = true};
+                } else {
+                    out->first = std::min(out->first, entry.to);
+                    out->end   = std::max(out->end, end);
+                }
+            }
+            return out;
+        }
+
     private:
         /// One load map entry as s_varm_crit_ram_trash_verify_block resolves it, before anything is read.
         struct LoadMapEntry {
@@ -791,6 +819,7 @@ namespace Kvasir { namespace Picobin {
             Kind          kind{Kind::refused};
             std::uint32_t from{};
             std::uint32_t size{};
+            std::uint32_t to{};   ///< the destination, a runtime address (loadTargets())
         };
 
         /// The LOAD_MAP's entry count (bits 24..30 of its header), 0 without one.
@@ -824,7 +853,9 @@ namespace Kvasir { namespace Picobin {
             if(storage
                == 0U) {   // zero fill: the ROM hashes its size (A2/A3: rounded up to a word)
                 return {.kind = LoadMapEntry::Kind::zeroFill,
-                        .size = a4 ? size : (size + 3U) & ~3U};
+                        .from = 0U,
+                        .size = a4 ? size : (size + 3U) & ~3U,
+                        .to   = to};
             }
             // the source, as an XIP address and then as bytes from the window start
             std::uint32_t from = storage;
@@ -843,7 +874,8 @@ namespace Kvasir { namespace Picobin {
             return {.kind = (size & 3U) != 0U ? LoadMapEntry::Kind::oddSource
                                               : LoadMapEntry::Kind::source,
                     .from = from - window_.xipAddress,
-                    .size = size};
+                    .size = size,
+                    .to   = to};
         }
 
         static constexpr std::uint32_t noFirst
@@ -1559,6 +1591,53 @@ namespace Kvasir { namespace Picobin {
                                   .end     = 20U,
                                   .loadMap = false}
         });
+
+        // no LOAD_MAP: nothing is copied, no load target
+        static_assert(!walk(minimumArm).loadTargets().has_value());
+
+        // one relative LOAD_MAP entry, the block's first 16 bytes to SRAM: its destination is the load target
+        struct CopyToSram {
+            static constexpr std::array<std::uint32_t, 4> words{
+              ItemHeader<ItemType::loadMap, 4, false, 0x0100U>::value,   // 1 entry, relative
+              0xffff'fff8U,   // storage: from the LOAD_MAP item (block word 2) back to the window's byte 0
+              0x2000'0000U,
+              16U};
+        };
+
+        inline constexpr auto copyToSram = asBytes(BlockLoop<Block<ArmSecure, CopyToSram>>::words);
+        static_assert(walk(copyToSram).loadTargets()
+                      == std::optional{
+                        Footprint{.first   = 0x2000'0000U,
+                                  .end     = 0x2000'0010U,
+                                  .loadMap = true}
+        });
+
+        // two relative entries, a copy of 16 bytes to 0x2000'1000 and a zero fill of 5 bytes at 0x2000'2000: the range
+        // runs from the lowest destination to the highest end, the zero fill's last word written whole (an A2 ROM takes
+        // the odd size); an A4 ROM refuses that size, and an entry the ROM refuses is no load target
+        struct CopyAndOddFill {
+            static constexpr std::array<std::uint32_t, 7> words{
+              ItemHeader<ItemType::loadMap, 7, false, 0x0200U>::value,   // 2 entries, relative
+              0xffff'fff8U,   // storage: from the LOAD_MAP item (block word 2) back to the window's byte 0
+              0x2000'1000U,
+              16U,
+              0U,   // storage 0: a zero fill
+              0x2000'2000U,
+              5U};
+        };
+
+        inline constexpr auto copyAndOddFill
+          = asBytes(BlockLoop<Block<ArmSecure, CopyAndOddFill>>::words);
+        static_assert(walk(copyAndOddFill,
+                           Window{
+                             .xipAddress = xipBaseAddress
+        },
+                           BootRules{.rom = RomVersion::a2})
+                        .loadTargets()
+                      == std::optional{Footprint{.first   = 0x2000'1000U,
+                                                 .end     = 0x2000'2008U,
+                                                 .loadMap = true}});
+        static_assert(!walk(copyAndOddFill).loadTargets().has_value());
 
         // TBYB and a VERSION item, in a two-block loop: the last executable IMAGE_DEF wins
         using Tbyb = ImageDef<ImageType::exe, ExeSecurity::s, ExeCpu::arm, ExeChip::rp2350, true>;

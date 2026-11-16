@@ -61,6 +61,15 @@ rom Kvasir::Detail::flashWriteImpl 104
 rom Kvasir::Detail::explicitBuyImpl 184
 rom Kvasir::Detail::loadPartitionTableImpl
 
+# Kvasir::Bootrom::ChainDetail::chain (rp_common ChainImage.hpp) calls chain_image CI, then, should it come back, reboot
+# RB, through the pointers it is handed. chain_image is NOT measured yet: 2048 B is an estimate, not a figure - the ROM
+# keeps its block buffer and the signature check's workspace in the work area the caller hands it (varm_blocks.c,
+# varm_launch_image.c), the rest is the search, SHA-256 and the launch's checks. Replace it by rom_stack.py's figure
+# over the A2 and A4 dumps above before an image that chains is called proven. rom_stack.py over the A2 dump above:
+# CI 908 B, a LOWER BOUND - its code reaches assembly without a label, a recursion and two indirect calls
+# the tool cannot follow; RB 40 B as in the table. So 2048 B is above what is measured, and still an estimate.
+rom Kvasir::Bootrom::ChainDetail::chain 2048
+
 # Kvasir::Clocks::Resus (rp_common ClockOutput.hpp): the resuscitation interrupt flushes the XIP cache through the ROM's
 # flash_flush_cache, looked up once and kept in a static (flushCache_)
 rom Kvasir::Clocks::Resus::onIsr 0

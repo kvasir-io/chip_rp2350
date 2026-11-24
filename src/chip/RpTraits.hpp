@@ -31,8 +31,8 @@ struct ChipTraits {
     // frequency is 25 MHz" (8.2.2, md l.30741).
     static constexpr std::uint64_t clkRefOnRoscHzCeiling = 25'000'000;
     // ROSC.DIV: written 0xaa00 + div, div 1..255 divides by div, 0 by 256, any other value by 256 (RP2350 datasheet
-    // 8.3.11, DIV, Table 643; 8.3.2: "the ROSC divider's maximum divisor has been increased from 32 to 256" - the
-    // older releases said 1..127 and 128)
+    // 8.3.11, DIV, Table 643; 8.3.2: "the ROSC divider's maximum divisor has been increased from 32 to 256" - earlier
+    // editions of the datasheet said 1..127 and 128)
     static constexpr std::uint32_t roscDivMax     = 255;
     static constexpr std::uint32_t roscDivOfZero  = 256;
     static constexpr std::uint32_t roscDivOfOther = 256;

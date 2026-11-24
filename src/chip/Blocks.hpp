@@ -2,8 +2,8 @@
 
 // The RP2350's gated blocks: every block FirstInitStep holds in reset, with its RESETS field, interrupt lines and
 // DMA requests (chip_rp_common Block.hpp explains the row; kvasir/Hal/Block.hpp the check it drives). A row names its
-// block's base address as a number from the address map (RP2350 datasheet 2.2.4 "APB registers", md l.1502-1583,
-// and 2.2.5 "AHB registers", md l.1587-1606): APB blocks are 32 KiB apart, AHB blocks 1 MiB. `Rp::Block<Regs>` finds
+// block's base address as a number from the address map (RP2350 datasheet 2.2.4 "APB registers", md l.1605-1676,
+// and 2.2.5 "AHB registers", md l.1680-1701): APB blocks are 32 KiB apart, AHB blocks 1 MiB. `Rp::Block<Regs>` finds
 // a row by the generated `Regs::baseAddr`, so a wrong number is "no block of the chip's table" at the first driver,
 // and tests/conformance asserts every row against its register set. HSTX has two rows: control on APB, FIFO on AHB.
 // The table includes only RESETS, the interrupt list and (through Block.hpp) DMA's request enum: a TU that names

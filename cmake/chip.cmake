@@ -6,7 +6,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../core/cmake/core.cmake)
 # Which chip this is, for every TU of an image (kvasir_chip DEFINITIONS reach them through kvasir::chip): the RP2350A
 # (QFN-60, 30 GPIOs, 4 analogue inputs) or the RP2350B (QFN-80, 48 GPIOs, 8 analogue inputs) (RP2350 datasheet chapter
 # 1, Table 1 "RP2350 device family"; the silicon says which in SYSINFO.PACKAGE_SEL, 0 = QFN80, 1 = QFN60, 12.15.1.2
-# Table 1308). Set it before include(kvasir.cmake) or as -DKVASIR_RP2350_MPU=...; kvasir_chip's MPU stays the J-Link
+# Table 1426). Set it before include(kvasir.cmake) or as -DKVASIR_RP2350_MPU=...; kvasir_chip's MPU stays the J-Link
 # device name. src/chip/rp2350.hpp and the shared rp_common headers test the macros with `#if defined(...)` (gcc
 # -Wundef), and rp_common/PinConfig.hpp defines Chip::part from them.
 set(KVASIR_RP2350_MPU
@@ -28,7 +28,7 @@ set(_chip_image_crc_exclude _LINKER_INTERN_after_vectors_start_ _LINKER_INTERN_a
 # into its boot ROM before anything is reset or written. The commander's `r` restarts the connected core only, and a
 # core 1 the old image launched runs on through the erase into the new image's RAM. PSM FRCE_OFF.PROC1 set, then
 # cleared, through the atomic aliases: PSM_BASE 0x40018000 + FRCE_OFF 0x4, PROC1 = bit 24 (RP2350 datasheet 7.4.4 "List
-# of registers", Table 531), +0x2000 set / +0x3000 clear (2.1.3 "Atomic register access"). uc_log's printer gets the
+# of registers", Table 563), +0x2000 set / +0x3000 clear (2.1.3 "Atomic register access"). uc_log's printer gets the
 # same lines (util.cmake PRE_RESET_COMMANDS -> --pre_reset_command) and writes them before its own resets and downloads
 # - it understands only `w4 <address> <value>`, keep them to that. Then WATCHDOG SCRATCH4 (WATCHDOG_BASE 0x400d8000 +
 # 0x1c, 12.9.7 "List of registers") to 0: disarms Kvasir::CoreResetGuard's watchdog boot vector (5.2.4), whose RAM
@@ -36,10 +36,10 @@ set(_chip_image_crc_exclude _LINKER_INTERN_after_vectors_start_ _LINKER_INTERN_a
 set(_chip_jlink_connect "w4 0x4001A004 0x01000000" "w4 0x4001B004 0x01000000" "w4 0x400d801c 0x00000000")
 
 # QMI stuck in direct mode with a transfer that never ends: DIRECT_CSR (XIP_QMI_BASE 0x400d0000 + 0x00) EN (bit 0) and
-# BUSY (bit 1) set (RP2350 datasheet 12.14, Table 1294), flash unreadable. A core reset does not free it; a watchdog
+# BUSY (bit 1) set (RP2350 datasheet 12.14, Table 1403), flash unreadable. A core reset does not free it; a watchdog
 # reset of every domain but PROC_COLD does: SCRATCH4 to 0 (no CoreResetGuard needed; rp_common WatchdogBoot.hpp),
-# PSM.WDSEL (PSM_BASE 0x40018000 + 0x8, Table 532, bits 24:1: the reboot list, src/chip/WatchdogDomains.hpp onReboot),
-# then WATCHDOG.CTRL.TRIGGER (0x400d8000 + 0x0, bit 31, Table 1248). The printer also runs the recovery before retrying
+# PSM.WDSEL (PSM_BASE 0x40018000 + 0x8, Table 564, bits 24:1: the reboot list, src/chip/WatchdogDomains.hpp onReboot),
+# then WATCHDOG.CTRL.TRIGGER (0x400d8000 + 0x0, bit 31, Table 1359). The printer also runs the recovery before retrying
 # a failed download (the QMI can wedge with DIRECT_CSR idle). util.cmake -> --stall_signature / --stall_recovery.
 # tools/kvasir_bench_chip.py `qmi --recover` writes these very words (it reads them here), and
 # tools/test_kvasir_bench_chip.py checks them and the connect words above against chip.svd.
@@ -49,7 +49,7 @@ set(_chip_jlink_stall_recovery "w4 0x400d801c 0x00000000" "w4 0x40018008 0x01fff
 # --flash_uncached_offset.
 set(_chip_jlink_uncached "0x04000000")
 # Flash readable over XIP only with DIRECT_CSR (0x400d0000) EN (bit 0) and ASSERT_CS0N (bit 2) clear: in direct mode an
-# XIP access is a bus error (RP2350 datasheet 12.14.5, Table 1294). BUSY left out: XIP fetches set it too. The printer
+# XIP access is a bus error (RP2350 datasheet 12.14.5, Table 1403). BUSY left out: XIP fetches set it too. The printer
 # reads flash only while these hold. util.cmake -> --flash_ready_signature.
 set(_chip_jlink_flash_ready "0x400d0000,0x5,0x0")
 # The XIP windows 0x10000000..0x1fffffff (datasheet 2.2): control-socket reads there pass the same gate. util.cmake ->

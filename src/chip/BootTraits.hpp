@@ -6,7 +6,7 @@
 // on every entry. On the RP2350 that matters for a RAM image packaged in flash (a load map and no VECTOR_TABLE item:
 // `<product>_release_ram_only_packaged.uf2`): the bootrom leaves VTOR on the flash copy, and every exception vector
 // would then come through XIP. An image started with VTOR already on its table is not changed by it. VTOR is
-// 0xE000ED08 (RP2350 datasheet 3.7, Table 202); the table, 68 entries -> 512 bytes, is the first thing at
+// 0xE000ED08 (RP2350 datasheet 3.7, Table 208); the table, 68 entries -> 512 bytes, is the first thing at
 // ORIGIN(flash) / ORIGIN(ram), so naturally aligned.
 #include "Blocks.hpp"
 #include "WatchdogDomains.hpp"
@@ -33,8 +33,8 @@ struct BootTraits {
     }
 
     // Enable the RCP (cp7) and the double-precision coprocessor (cp4: the DCP of the current security state, RP2350
-    // datasheet 3.6.2, md l.4715; CPACR.CP4 bits 9:8, l.9704), which dcp_double.S puts behind the runtime's double
-    // functions; a coprocessor is enabled in CPACR before any access from Secure code (3.6, l.4562). The FPU (cp10,
+    // datasheet 3.6.2, md l.5527; CPACR.CP4 bits 9:8, l.10877), which dcp_double.S puts behind the runtime's double
+    // functions; a coprocessor is enabled in CPACR before any access from Secure code (3.6, l.5356). The FPU (cp10,
     // cp11) is the core's: core_cortex_m33's Startup::Core::startup() opened it before this runs, so these two fields
     // are a read-modify-write that leaves CP10/CP11 as they are (no overrideDefaults: it would close the FPU again).
     [[gnu::always_inline]] static void enableCoprocessors() {
@@ -47,8 +47,8 @@ struct BootTraits {
     // The RCP's salt, if nothing has written it: the boot ROM seeds it on its boot path, which an image a debugger
     // started in RAM never went through. With the salt invalid any RCP instruction but canary_status and a salt write
     // is an RCP fault (NMI), and the boot ROM's API functions run RCP canary checks (RP2350 datasheet 3.6.3.1,
-    // md l.5075-5081; 3.2.1, l.3799). Status 0xa500a500 valid / 0x00c300c3 invalid (l.5331); writing a valid salt is a
-    // fault too (l.5083). Core 0's salt only. The value: 64 ROSC RANDOMBIT reads (rp_common/Rosc.hpp), not a secret.
+    // md l.6009-6015; 3.2.1, l.4610). Status 0xa500a500 valid / 0x00c300c3 invalid (l.6283); writing a valid salt is a
+    // fault too (l.6017). Core 0's salt only. The value: 64 ROSC RANDOMBIT reads (rp_common/Rosc.hpp), not a secret.
     // Encodings as pico-sdk's hardware/rcp.h (rcp_canary_status, rcp_salt_core0).
     [[gnu::always_inline]] static void seedRcpSaltIfInvalid() {
         std::uint32_t status{};
@@ -113,7 +113,7 @@ struct BootTraits {
 
     [[gnu::always_inline]] static void selectWatchdogDomains() {
         WatchdogDomains::onTimeout();
-        // every block (RESETS.WDSEL has RESETS.RESET's bits: RP2350 datasheet Tables 535/536, md l.25266/25316)
+        // every block (RESETS.WDSEL has RESETS.RESET's bits: RP2350 datasheet Tables 567/568, md l.27917/27970)
         Rp::setEveryField<Kvasir::Peripheral::RESETS::Registers<>::WDSEL>();
     }
 };

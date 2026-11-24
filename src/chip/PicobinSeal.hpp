@@ -216,7 +216,7 @@ namespace Kvasir { namespace Picobin {
         out.linkAt      = last.linkAt;
         out.link        = out.blockOffset - last.offset;
         // The runtime address of the image's byte `o` is runtimeBase + o: the XIP base, less the rolling window's delta
-        // (startEntry's roll; RP2350 datasheet 5.1.4, md l.18923-18925: a delta of 0x1000 maps partition offset 0x1000
+        // (startEntry's roll; RP2350 datasheet 5.1.4, md l.21024-21026: a delta of 0x1000 maps partition offset 0x1000
         // to 0x10000000, and what lies before it is not mapped). A positive delta: the image's mapped part starts there.
         std::uint32_t const delta       = launched->rollingWindowDelta;
         std::uint32_t const runtimeBase = xipBaseAddress - delta;

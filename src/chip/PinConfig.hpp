@@ -36,6 +36,6 @@ namespace Kvasir { namespace PinConfig {
         static constexpr auto interrupts = brigand::list<decltype(Kvasir::Interrupt::pwm_wrap_0)>{};
     };
 
-    // the pins' UART/SPI/I2C roles: rp_common/PinConfig.hpp functionSelect (formulas from Table 645)
+    // the pins' UART/SPI/I2C roles: rp_common/PinConfig.hpp functionSelect (formulas from Table 677)
 
 }}   // namespace Kvasir::PinConfig

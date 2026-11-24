@@ -47,8 +47,8 @@
 
 namespace Kvasir { namespace Mpu {
 
-    // The RP2350's Cortex-M33 has 8 regions (MPU_TYPE.DREGION resets to 0x08: RP2350 datasheet 3.7 Table 232, md
-    // l.9753); the layout below takes 5 of them.
+    // The RP2350's Cortex-M33 has 8 regions (MPU_TYPE.DREGION resets to 0x08: RP2350 datasheet 3.7 Table 238, md
+    // l.10922); the layout below takes 5 of them.
     inline constexpr unsigned    kImplementedRegions = 8;
     inline constexpr std::size_t kRegions            = 5;
     static_assert(kRegions <= kImplementedRegions);

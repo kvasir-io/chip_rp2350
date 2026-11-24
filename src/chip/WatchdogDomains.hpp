@@ -1,12 +1,12 @@
 #pragma once
 // The RP2350's PSM.WDSEL: the power-on state machine stages a watchdog reset runs through (RP2350 datasheet 7.4.4,
-// WDSEL Table 532), one list per intent (chip_rp_common BootSequence.hpp, BootromReboot.hpp):
+// WDSEL Table 564), one list per intent (chip_rp_common BootSequence.hpp, BootromReboot.hpp):
 // - onTimeout: what a watchdog that runs out resets, set by FirstInitStep - every stage, PROC_COLD included: a hang
 //   gets the fullest reset the watchdog can give.
 // - onReboot: Kvasir's own reboot (Rp::watchdogReboot) and the probe's stall recovery (cmake/chip.cmake,
 //   `0x01fffffe`) - everything but PROC_COLD, as the boot ROM's reboot(): a deliberate reboot keeps the processor cold
 //   domain, which by POWMAN WDSEL.RESET_SWCORE ("the same as setting RSM_WDSEL_PROC_COLD", "from a hardware debug
-//   perspective ... the same effect as a power-on reset", Table 490, md l.23588) holds the debug state; that the
+//   perspective ... the same effect as a power-on reset", Table 522, md l.26161) holds the debug state; that the
 //   halt-on-reset bits are part of it is not stated there (unchecked). The RESETS stage is in both (every peripheral
 //   back into reset), and so are the PROC stages (core 1 back into the boot ROM's holding pen).
 #include "kvasir/Register/Register.hpp"
@@ -56,9 +56,9 @@ struct WatchdogDomains {
 
     [[gnu::always_inline]] static void onReboot() { selectStages(clear(PsmWdsel::proc_cold)); }
 
-    // SYSCFG.AUXCTRL bit 0 (Table 1317, md l.61148): "Force POWMAN clock to switch to LPOSC ... This must be set
+    // SYSCFG.AUXCTRL bit 0 (Table 1435, md l.67304): "Force POWMAN clock to switch to LPOSC ... This must be set
     // before initiating a watchdog reset of the RSM from a stage that includes CLOCKS, if POWMAN is running from
-    // clk_ref" - its default (SEQ_CFG.USING_FAST_POWCK reset 1, Table 491 md l.23609), and both intents include
+    // clk_ref" - its default (SEQ_CFG.USING_FAST_POWCK reset 1, Table 523 md l.26186), and both intents include
     // CLOCKS. The table states no time for the switch; SEQ_CFG.USING_FAST_POWCK (RO) reads 0 once "the POWMAN clock
     // is running from the low power oscillator": waited for, bounded (Chip::PowmanLposcBound). False on a timeout.
     // While the bit is set POWMAN (and the AON timer) runs from the 32 kHz LPOSC, each POWMAN access ~100 us: only

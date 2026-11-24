@@ -20091,7 +20091,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <name>CHIP_ID</name>
                     <addressOffset>0x00000000</addressOffset>
                     <description>JEDEC JEP-106 compliant chip identifier.</description>
-                    <resetValue>0x00000001</resetValue>
+                    <resetValue>0x30004927</resetValue>
                     <fields>
                         <field>
                             <name>REVISION</name>
@@ -20276,7 +20276,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[0:0]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.13 Table 1281) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.13 Table 1390) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                     </fields>
@@ -20907,14 +20907,18 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>L2_NBITS</name>
                             <description
                                 >Number of valid data bits for the lane 2 TMDS encoder, starting from bit 7 of the rotated data. Field
-                                values of 0 -&gt; 7 encode counts of 1 -&gt; 8 bits.</description
+                                values of 0 -&gt; 7 encode counts of 1 -&gt; 8 bits. Remaining LSBs are masked to 0 after the
+                                rotate.</description
                             >
                             <bitRange>[23:21]</bitRange>
                             <access>read-write</access>
                         </field>
                         <field>
                             <name>L2_ROT</name>
-                            <description>Right-rotate applied to the current shifter data before the lane 2 TMDS encoder.</description>
+                            <description
+                                >Right-rotate applied to the current shifter data before the lane 2 TMDS encoder. Remaining LSBs are masked
+                                to 0 after the rotate.</description
+                            >
                             <bitRange>[20:16]</bitRange>
                             <access>read-write</access>
                         </field>
@@ -20922,14 +20926,18 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>L1_NBITS</name>
                             <description
                                 >Number of valid data bits for the lane 1 TMDS encoder, starting from bit 7 of the rotated data. Field
-                                values of 0 -&gt; 7 encode counts of 1 -&gt; 8 bits.</description
+                                values of 0 -&gt; 7 encode counts of 1 -&gt; 8 bits. Remaining LSBs are masked to 0 after the
+                                rotate.</description
                             >
                             <bitRange>[15:13]</bitRange>
                             <access>read-write</access>
                         </field>
                         <field>
                             <name>L1_ROT</name>
-                            <description>Right-rotate applied to the current shifter data before the lane 1 TMDS encoder.</description>
+                            <description
+                                >Right-rotate applied to the current shifter data before the lane 1 TMDS encoder. Remaining LSBs are masked
+                                to 0 after the rotate.</description
+                            >
                             <bitRange>[12:8]</bitRange>
                             <access>read-write</access>
                         </field>
@@ -20937,14 +20945,18 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>L0_NBITS</name>
                             <description
                                 >Number of valid data bits for the lane 0 TMDS encoder, starting from bit 7 of the rotated data. Field
-                                values of 0 -&gt; 7 encode counts of 1 -&gt; 8 bits.</description
+                                values of 0 -&gt; 7 encode counts of 1 -&gt; 8 bits. Remaining LSBs are masked to 0 after the
+                                rotate.</description
                             >
                             <bitRange>[7:5]</bitRange>
                             <access>read-write</access>
                         </field>
                         <field>
                             <name>L0_ROT</name>
-                            <description>Right-rotate applied to the current shifter data before the lane 0 TMDS encoder.</description>
+                            <description
+                                >Right-rotate applied to the current shifter data before the lane 0 TMDS encoder. Remaining LSBs are masked
+                                to 0 after the rotate.</description
+                            >
                             <bitRange>[4:0]</bitRange>
                             <access>read-write</access>
                         </field>
@@ -31987,8 +31999,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>X4</name>
                             <description
                                 >Multiplies the startup_delay by 4, just in case. The reset value is controlled by a mask-programmable
-                                tiecell and is provided in case we are booting from XOSC and the default startup delay is insufficient. The
-                                reset value is 0x0.</description
+                                tiecell and is provided in case we are booting from XOSC and the default startup delay is
+                                insufficient</description
                             >
                             <bitRange>[20:20]</bitRange>
                             <access>read-write</access>
@@ -32240,7 +32252,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x00000004</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32276,7 +32288,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x00000000</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32299,7 +32311,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x00000000</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32378,7 +32390,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32458,7 +32470,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32540,7 +32552,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32620,7 +32632,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32700,7 +32712,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32780,7 +32792,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32860,7 +32872,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -32940,7 +32952,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33020,7 +33032,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33100,7 +33112,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33180,7 +33192,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33260,7 +33272,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33340,7 +33352,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33420,7 +33432,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33502,7 +33514,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33582,7 +33594,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33662,7 +33674,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33742,7 +33754,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33824,7 +33836,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33907,7 +33919,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000ff</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -33989,7 +34001,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34069,7 +34081,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34151,7 +34163,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34233,7 +34245,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34315,7 +34327,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34397,7 +34409,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34479,7 +34491,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34559,7 +34571,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34639,7 +34651,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34719,7 +34731,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34799,7 +34811,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34879,7 +34891,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -34959,7 +34971,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35039,7 +35051,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35119,7 +35131,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35199,7 +35211,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35279,7 +35291,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35359,7 +35371,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35439,7 +35451,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000fc</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35519,7 +35531,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35599,7 +35611,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35679,7 +35691,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000f8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35759,7 +35771,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35839,7 +35851,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35919,7 +35931,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -35999,7 +36011,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -36079,7 +36091,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -36161,7 +36173,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -36243,7 +36255,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -36323,7 +36335,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -36405,7 +36417,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -36485,7 +36497,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -36567,7 +36579,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000b8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -36649,7 +36661,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <resetValue>0x000000f8</resetValue>
                     <!-- Kvasir: write key PASSWORD[31:16] = 0xACCE: "all ACCESSCTRL registers, except GPIO_NSMASK0 and GPIO_NSMASK1, require the
                          16-bit value 0xacce to be present in the most-significant 16 bits of the write data"; a write without it fails and
-                         returns a bus fault (RP2350 datasheet 10.6, md l.41568-41572). The register has no field up there: svd_converter
+                         returns a bus fault (RP2350 datasheet 10.6, md l.43167-43171). The register has no field up there: svd_converter
                          adds the key field, so every write names it. -->
                     <fields>
                         <field>
@@ -38030,7 +38042,7 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>DIV</name>
                             <description
-                                >set to 0xaa00 + div where div = 0 divides by 128 div = 1-127 divides by div any other value sets div=128
+                                >set to 0xaa00 + div where div = 0 divides by 256 div = 1-255 divides by div any other value sets div=256
                                 this register resets to div=32</description
                             >
                             <bitRange>[15:0]</bitRange>
@@ -38190,7 +38202,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38256,7 +38268,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38334,7 +38346,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38392,7 +38404,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38450,7 +38462,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38487,7 +38499,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38532,7 +38544,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38577,7 +38589,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38622,7 +38634,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38665,7 +38677,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38695,7 +38707,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <!-- Kvasir: write key PASSWORD[31:16] = 0x5AFE: protected POWMAN register (offset <= 0xAC), a write is ignored unless
                          bits 31:16 carry the password; read-only fields sit in that range ("Protected registers obviously don't have
                          writeable fields in the top 16 bits, however they may have read-only fields in that range", RP2350 datasheet 6.4,
-                         md l.23076-23082), so it is no field here: svd_converter adds the key field. -->
+                         md l.25586-25590), so it is no field here: svd_converter adds the key field. -->
                     <fields>
                         <field>
                             <name>HAD_WATCHDOG_RESET_RSM</name>
@@ -38854,7 +38866,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>RESET_SWCORE</name>
                             <description
                                 >If set to 1, a watchdog reset will reset the switched core power domain and run the full power-on state
-                                machine (PSM) sequence From a user perspective it is the same as setting RSM_WDSEL_PROC_COLD From a hardware
+                                machine (PSM) sequence From a user perspective it is the same as setting PSM_WDSEL_PROC_COLD From a hardware
                                 debug perspective it has the same effect as a power-on reset for the switched core power domain</description
                             >
                             <bitRange>[8:8]</bitRange>
@@ -38880,7 +38892,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -38910,7 +38922,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <!-- Kvasir: write key PASSWORD[31:16] = 0x5AFE: protected POWMAN register (offset <= 0xAC), a write is ignored unless
                          bits 31:16 carry the password; read-only fields sit in that range ("Protected registers obviously don't have
                          writeable fields in the top 16 bits, however they may have read-only fields in that range", RP2350 datasheet 6.4,
-                         md l.23076-23082), so it is no field here: svd_converter adds the key field. -->
+                         md l.25586-25590), so it is no field here: svd_converter adds the key field. -->
                     <fields>
                         <field>
                             <name>USING_FAST_POWCK</name>
@@ -39098,7 +39110,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-only</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39136,7 +39148,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39192,7 +39204,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39249,7 +39261,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39306,7 +39318,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39349,12 +39361,11 @@ SPDX-License-Identifier: BSD-3-Clause
                         </field>
                         <field>
                             <name>SOURCE_SEL</name>
-                            <description>0 -&gt; gpio12 1 -&gt; gpio20 2 -&gt; gpio14 3 -&gt; gpio22</description>
                             <bitRange>[1:0]</bitRange>
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39394,7 +39405,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39434,7 +39445,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39474,7 +39485,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39514,7 +39525,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39551,7 +39562,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39588,7 +39599,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39625,7 +39636,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39662,7 +39673,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39726,7 +39737,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39760,7 +39771,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39794,7 +39805,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39828,7 +39839,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -39857,7 +39868,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <!-- Kvasir: write key PASSWORD[31:16] = 0x5AFE: protected POWMAN register (offset <= 0xAC), a write is ignored unless
                          bits 31:16 carry the password; read-only fields sit in that range ("Protected registers obviously don't have
                          writeable fields in the top 16 bits, however they may have read-only fields in that range", RP2350 datasheet 6.4,
-                         md l.23076-23082), so it is no field here: svd_converter adds the key field. -->
+                         md l.25586-25590), so it is no field here: svd_converter adds the key field. -->
                     <fields>
                         <field>
                             <name>USING_GPIO_1HZ</name>
@@ -39897,7 +39908,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>switch to gpio as the source of the 1kHz timer tick</description>
                             <bitRange>[10:10]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 512; the register also needs the 0x5AFE password) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 544; the register also needs the 0x5AFE password) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -39905,7 +39916,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>switch to xosc as the source of the 1kHz timer tick</description>
                             <bitRange>[9:9]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 512; the register also needs the 0x5AFE password) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 544; the register also needs the 0x5AFE password) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -39913,7 +39924,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Switch to lposc as the source of the 1kHz timer tick</description>
                             <bitRange>[8:8]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 512; the register also needs the 0x5AFE password) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 544; the register also needs the 0x5AFE password) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -39943,19 +39954,19 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[2:2]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 512; the register also needs the 0x5AFE password) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 6.4 Table 544; the register also needs the 0x5AFE password) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
                             <name>RUN</name>
                             <description
-                                >Timer enable. Setting this bit causes the timer to begin counting up from its current value. Clearing this
-                                bit stops the timer from counting. Before enabling the timer, set the POWMAN_LPOSC_FREQ* and
-                                POWMAN_XOSC_FREQ* registers to configure the count rate, and initialise the current time by writing to
-                                SET_TIME_63TO48 through SET_TIME_15TO0. You must not write to the SET_TIME_x registers when the timer is
-                                running. Once configured, start the timer by setting POWMAN_TIMER_RUN=1. This will start the timer running
-                                from the LPOSC. When the XOSC is available switch the reference clock to XOSC then select it as the timer
-                                clock by setting POWMAN_TIMER_USE_XOSC=1</description
+                                >Timer enable. Setting this bit loads the timer with the values within the SET_TIME registers, and causes
+                                the timer to begin counting up. Clearing this bit stops the timer from counting. Before enabling the timer,
+                                set the POWMAN_LPOSC_FREQ* and POWMAN_XOSC_FREQ* registers to configure the count rate, and initialise the
+                                current time by writing to SET_TIME_63TO48 through SET_TIME_15TO0. You must not write to the SET_TIME_x
+                                registers when the timer is running. Once configured, start the timer by setting POWMAN_TIMER_RUN=1. This
+                                will start the timer running from the LPOSC. When the XOSC is available switch the reference clock to XOSC
+                                then select it as the timer clock by setting POWMAN_TIMER_USE_XOSC=1</description
                             >
                             <bitRange>[1:1]</bitRange>
                             <access>read-write</access>
@@ -40047,7 +40058,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -40145,7 +40156,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -40243,7 +40254,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -40341,7 +40352,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -40412,7 +40423,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -40451,9 +40462,9 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>NEXT</name>
                             <description
                                 >This flag always ORs writes into its current contents. It can be set but not cleared by software. The
-                                BOOTDIS_NEXT bit is OR&#39;d into the BOOTDIS_NOW bit when the core is powered down. Simultaneously, the
+                                BOOTDIS_NEXT bit is OR'd into the BOOTDIS_NOW bit when the core is powered down. Simultaneously, the
                                 BOOTDIS_NEXT bit is cleared. Setting this bit means that the BOOT0..3 registers will be ignored following
-                                the next reset of the RSM by powman. This flag should be set by an early boot stage that has soft-locked OTP
+                                the next reset of the PSM by powman. This flag should be set by an early boot stage that has soft-locked OTP
                                 pages, to prevent later stages from unlocking it by power cycling.</description
                             >
                             <bitRange>[1:1]</bitRange>
@@ -40462,17 +40473,17 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>NOW</name>
                             <description
-                                >When powman resets the RSM, the current value of BOOTDIS_NEXT is OR&#39;d into BOOTDIS_NOW, and
-                                BOOTDIS_NEXT is cleared. The bootrom checks this flag before reading the BOOT0..3 registers. If it is set,
-                                the bootrom clears it, and ignores the BOOT registers. This prevents Secure software from diverting the boot
-                                path before a bootloader has had the chance to soft lock OTP pages containing sensitive data.</description
+                                >When powman resets the PSM, the current value of BOOTDIS_NEXT is OR'd into BOOTDIS_NOW, and BOOTDIS_NEXT is
+                                cleared. The bootrom checks this flag before reading the BOOT0..3 registers. If it is set, the bootrom
+                                clears it, and ignores the BOOT registers. This prevents Secure software from diverting the boot path before
+                                a bootloader has had the chance to soft lock OTP pages containing sensitive data.</description
                             >
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
                             <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -40509,7 +40520,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <access>read-write</access>
                         </field>
                         <!-- Kvasir: protected POWMAN register (offset <= 0xAC): a write is ignored unless bits 31:16 carry the
-                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.23076-23078). A one-value
+                             password 0x5AFE, and a read does not return it (RP2350 datasheet 6.4, md l.25586-25588). A one-value
                              writeConstraint makes it a key: every write must name it (Register::RmwHazard MustSupply). -->
                         <field>
                             <name>PASSWORD</name>
@@ -40833,7 +40844,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Trigger a watchdog reset</description>
                             <bitRange>[31:31]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.9 Table 1248) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.9 Table 1359) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -44874,7 +44885,7 @@ SPDX-License-Identifier: BSD-3-Clause
                                     until low. Counter must be running at less than full speed (div_int + div_frac / 16 &gt; 1)</description
                                 >
                                 <name>PH_ADV</name>
-                                <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC, reads 1 until done: 'Write a 1, and poll until low'; RP2350 datasheet 12.5 Table 1132) -->
+                                <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC, reads 1 until done: 'Write a 1, and poll until low'; RP2350 datasheet 12.5 Table 1185) -->
                                 <modifiedWriteValues>oneToSet</modifiedWriteValues>
                             </field>
                             <field>
@@ -44885,7 +44896,7 @@ SPDX-License-Identifier: BSD-3-Clause
                                     until low. Counter must be running.</description
                                 >
                                 <name>PH_RET</name>
-                                <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC, reads 1 until done: 'Write a 1, and poll until low'; RP2350 datasheet 12.5 Table 1132) -->
+                                <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC, reads 1 until done: 'Write a 1, and poll until low'; RP2350 datasheet 12.5 Table 1185) -->
                                 <modifiedWriteValues>oneToSet</modifiedWriteValues>
                             </field>
                             <field>
@@ -45652,7 +45663,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Start a single conversion. Self-clearing. Ignored if start_many is asserted.</description>
                             <bitRange>[2:2]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.4 Table 1121) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.4 Table 1174) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -46361,7 +46372,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[7:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read pops the RX FIFO (or sets RX_UNDER), and every write pushes a TX FIFO entry: only whole-register writes (RP2350 datasheet 12.2 Table 1059) -->
+                            <!-- Kvasir: a read pops the RX FIFO (or sets RX_UNDER), and every write pushes a TX FIFO entry: only whole-register writes (RP2350 datasheet 12.2 Table 1112) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -49198,7 +49209,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[26:26]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 1038) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -49210,7 +49221,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[25:25]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 1038) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -49223,7 +49234,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[24:24]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 1038) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -49240,7 +49251,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[23:20]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 1038) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -49255,7 +49266,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[19:16]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 1038) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -49273,7 +49284,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[11:8]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 1038) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -49287,7 +49298,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             >
                             <bitRange>[7:4]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 982) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 11.7 Table 1038) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -54420,7 +54431,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK0</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 448) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -54438,7 +54449,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK1</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 448) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -54456,7 +54467,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK2</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 448) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -54474,7 +54485,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK3</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 448) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -54492,7 +54503,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK4</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 448) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -54510,7 +54521,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK5</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 448) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -54528,7 +54539,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK6</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 448) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -54546,7 +54557,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>BOOTLOCK7</name>
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
-                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 438) -->
+                            <!-- Kvasir: a read claims the lock ("Read to claim and check", RP2350 datasheet 4.3 Table 448) -->
                             <readAction>modify</readAction>
                         </field>
                     </fields>
@@ -54829,7 +54840,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Host: Reset bus</description>
                             <bitRange>[13:13]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1201) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1312) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -54837,7 +54848,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Device: Remote wakeup. Device can initiate its own resume after suspend.</description>
                             <bitRange>[12:12]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1201) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1312) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -54875,7 +54886,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Host: Stop transaction</description>
                             <bitRange>[4:4]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1201) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1312) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -54901,7 +54912,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Host: Start transaction</description>
                             <bitRange>[0:0]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1201) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 12.7 Table 1312) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                     </fields>
@@ -55055,11 +55066,12 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>SUSPENDED</name>
                             <description
-                                >Bus in suspended state. Valid for device. Device will go into suspend if neither Keep Alive / SOF frames
-                                are enabled.</description
+                                >Bus in suspended state. Valid for device and host. Host and device will go into suspend if neither Keep
+                                Alive / SOF frames are enabled.</description
                             >
                             <bitRange>[4:4]</bitRange>
                             <access>read-write</access>
+                            <!-- Kvasir: write-one-to-clear, kept so against pico-sdk 2.3.1's RP2350.svd and the RP2350 datasheet's SIE_STATUS table (both RO): the same datasheet's INTR.DEV_SUSPEND is "Cleared by writing to SIE_STATUS.SUSPENDED" (12.7 List of registers), the RP2040's SIE_STATUS has it WC, and the USB backend acknowledges DEV_SUSPEND so (chip_rp_common usb/backend.hpp) -->
                             <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         </field>
                         <field>
@@ -57650,8 +57662,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>VN_ERR_INT_MASK</name>
                             <description
-                                >1&#39;b1-mask interrupt, no interrupt will be generated. See RNG_ISR for an explanation on this
-                                interrupt.</description
+                                >Set to 1 to mask (disable) this interrupt: no interrupt will be generated. See RNG_ISR for an explanation
+                                on this interrupt.</description
                             >
                             <bitRange>[3:3]</bitRange>
                             <access>read-write</access>
@@ -57659,8 +57671,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>CRNGT_ERR_INT_MASK</name>
                             <description
-                                >1&#39;b1-mask interrupt, no interrupt will be generated. See RNG_ISR for an explanation on this
-                                interrupt.</description
+                                >Set to 1 to mask (disable) this interrupt: no interrupt will be generated. See RNG_ISR for an explanation
+                                on this interrupt.</description
                             >
                             <bitRange>[2:2]</bitRange>
                             <access>read-write</access>
@@ -57668,8 +57680,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>AUTOCORR_ERR_INT_MASK</name>
                             <description
-                                >1&#39;b1-mask interrupt, no interrupt will be generated. See RNG_ISR for an explanation on this
-                                interrupt.</description
+                                >Set to 1 to mask (disable) this interrupt: no interrupt will be generated. See RNG_ISR for an explanation
+                                on this interrupt.</description
                             >
                             <bitRange>[1:1]</bitRange>
                             <access>read-write</access>
@@ -57677,8 +57689,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>EHR_VALID_INT_MASK</name>
                             <description
-                                >1&#39;b1-mask interrupt, no interrupt will be generated. See RNG_ISR for an explanation on this
-                                interrupt.</description
+                                >Set to 1 to mask (disable) this interrupt: no interrupt will be generated. See RNG_ISR for an explanation
+                                on this interrupt.</description
                             >
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
@@ -57702,8 +57714,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>VN_ERR</name>
                             <description
-                                >1&#39;b1 indicates Von Neuman error. Error in von Neuman occurs if 32 consecutive collected bits are
-                                identical, ZERO or ONE.</description
+                                >1 indicates von Neumann error. Error in von Neumann occurs if 32 consecutive collected bits are identical,
+                                ZERO or ONE.</description
                             >
                             <bitRange>[3:3]</bitRange>
                             <access>read-only</access>
@@ -57711,8 +57723,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>CRNGT_ERR</name>
                             <description
-                                >1&#39;b1 indicates CRNGT in the RNG test failed. Failure occurs when two consecutive blocks of 16 collected
-                                bits are equal.</description
+                                >1 indicates CRNGT in the RNG test failed. Failure occurs when two consecutive blocks of 16 collected bits
+                                are equal.</description
                             >
                             <bitRange>[2:2]</bitRange>
                             <access>read-only</access>
@@ -57720,17 +57732,15 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>AUTOCORR_ERR</name>
                             <description
-                                >1&#39;b1 indicates Autocorrelation test failed four times in a row. When set, RNG cease from functioning
-                                until next reset.</description
+                                >1 indicates Autocorrelation test failed four times in a row. When set, RNG ceases functioning until next
+                                reset.</description
                             >
                             <bitRange>[1:1]</bitRange>
                             <access>read-only</access>
                         </field>
                         <field>
                             <name>EHR_VALID</name>
-                            <description
-                                >1&#39;b1 indicates that 192 bits have been collected in the RNG, and are ready to be read.</description
-                            >
+                            <description>1 indicates that 192 bits have been collected in the RNG, and are ready to be read.</description>
                             <bitRange>[0:0]</bitRange>
                             <access>read-only</access>
                         </field>
@@ -57750,13 +57760,13 @@ SPDX-License-Identifier: BSD-3-Clause
                         </field>
                         <field>
                             <name>VN_ERR</name>
-                            <description>Write 1&#39;b1 - clear corresponding bit in RNG_ISR.</description>
+                            <description>Write 1 to clear corresponding bit in RNG_ISR.</description>
                             <bitRange>[3:3]</bitRange>
                             <access>read-write</access>
                         </field>
                         <field>
                             <name>CRNGT_ERR</name>
-                            <description>Write 1&#39;b1 - clear corresponding bit in RNG_ISR.</description>
+                            <description>Write 1 to clear corresponding bit in RNG_ISR.</description>
                             <bitRange>[2:2]</bitRange>
                             <access>read-write</access>
                         </field>
@@ -57768,7 +57778,7 @@ SPDX-License-Identifier: BSD-3-Clause
                         </field>
                         <field>
                             <name>EHR_VALID</name>
-                            <description>Write 1&#39;b1 - clear corresponding bit in RNG_ISR.</description>
+                            <description>Write 1 - clear corresponding bit in RNG_ISR.</description>
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
                         </field>
@@ -57790,7 +57800,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <name>RND_SRC_SEL</name>
                             <description
                                 >Selects the number of inverters (out of four possible selections) in the ring oscillator (the entropy
-                                source).</description
+                                source). Higher values select longer inverter chain lengths.</description
                             >
                             <bitRange>[1:0]</bitRange>
                             <access>read-write</access>
@@ -57812,7 +57822,7 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>EHR_VALID</name>
                             <description
-                                >1&#39;b1 indicates that collection of bits in the RNG is completed, and data can be read from EHR_DATA
+                                >1 indicates that collection of bits in the RNG is completed, and data can be read from EHR_DATA
                                 register.</description
                             >
                             <bitRange>[0:0]</bitRange>
@@ -57918,7 +57928,7 @@ SPDX-License-Identifier: BSD-3-Clause
                         </field>
                         <field>
                             <name>RND_SRC_EN</name>
-                            <description>* 1&#39;b1 - entropy source is enabled. *1&#39;b0 - entropy source is disabled</description>
+                            <description>* 1 - entropy source is enabled. * 0 - entropy source is disabled</description>
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
                         </field>
@@ -57933,8 +57943,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>SAMPLE_CNTR1</name>
                             <description
-                                >Sets the number of rng_clk cycles between two consecutive ring oscillator samples. Note! If the Von-Neuman
-                                is bypassed, the minimum value for sample counter must not be less then decimal seventeen</description
+                                >Sets the number of rng_clk cycles between two consecutive ring oscillator samples. Note: If the von Neumann
+                                decorrelator is bypassed, the minimum value for sample counter must not be less than seventeen</description
                             >
                             <bitRange>[31:0]</bitRange>
                             <access>read-write</access>
@@ -57994,7 +58004,7 @@ SPDX-License-Identifier: BSD-3-Clause
                         <field>
                             <name>VNC_BYPASS</name>
                             <description
-                                >When set, the Von-Neuman balancer is bypassed (including the 32 consecutive bits test).</description
+                                >When set, the Von-Neuman balancer is bypassed (including the 32 consecutive bits test). N/A</description
                             >
                             <bitRange>[1:1]</bitRange>
                             <access>read-write</access>
@@ -58021,7 +58031,7 @@ SPDX-License-Identifier: BSD-3-Clause
                         </field>
                         <field>
                             <name>TRNG_SW_RESET</name>
-                            <description>Writing 1&#39;b1 to this register causes an internal RNG reset.</description>
+                            <description>Writing 1 to this register causes an internal RNG reset.</description>
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
                         </field>
@@ -58041,7 +58051,7 @@ SPDX-License-Identifier: BSD-3-Clause
                         </field>
                         <field>
                             <name>RNG_DEBUG_EN</name>
-                            <description>* 1&#39;b1 - debug mode is enabled. *1&#39;b0 - debug mode is disabled</description>
+                            <description>* 1 - debug mode is enabled. * 0 - debug mode is disabled</description>
                             <bitRange>[0:0]</bitRange>
                             <access>read-write</access>
                         </field>
@@ -58104,49 +58114,49 @@ SPDX-License-Identifier: BSD-3-Clause
                         </field>
                         <field>
                             <name>RNG_USE_5_SBOXES</name>
-                            <description>* 1&#39;b1 - 5 SBOX AES. *1&#39;b0 - 20 SBOX AES</description>
+                            <description>* 1 - 5 SBOX AES. * 0 - 20 SBOX AES</description>
                             <bitRange>[7:7]</bitRange>
                             <access>read-only</access>
                         </field>
                         <field>
                             <name>RESEEDING_EXISTS</name>
-                            <description>* 1&#39;b1 - Exists. *1&#39;b0 - Does not exist</description>
+                            <description>* 1 - Exists. * 0 - Does not exist</description>
                             <bitRange>[6:6]</bitRange>
                             <access>read-only</access>
                         </field>
                         <field>
                             <name>KAT_EXISTS</name>
-                            <description>* 1&#39;b1 - Exists. *1&#39;b0 - Does not exist</description>
+                            <description>* 1 - Exists. * 0 - Does not exist</description>
                             <bitRange>[5:5]</bitRange>
                             <access>read-only</access>
                         </field>
                         <field>
                             <name>PRNG_EXISTS</name>
-                            <description>* 1&#39;b1 - Exists. *1&#39;b0 - Does not exist</description>
+                            <description>* 1 - Exists. * 0 - Does not exist</description>
                             <bitRange>[4:4]</bitRange>
                             <access>read-only</access>
                         </field>
                         <field>
                             <name>TRNG_TESTS_BYPASS_EN</name>
-                            <description>* 1&#39;b1 - Exists. *1&#39;b0 - Does not exist</description>
+                            <description>* 1 - Exists. * 0 - Does not exist</description>
                             <bitRange>[3:3]</bitRange>
                             <access>read-only</access>
                         </field>
                         <field>
                             <name>AUTOCORR_EXISTS</name>
-                            <description>* 1&#39;b1 - Exists. *1&#39;b0 - Does not exist</description>
+                            <description>* 1 - Exists. * 0 - Does not exist</description>
                             <bitRange>[2:2]</bitRange>
                             <access>read-only</access>
                         </field>
                         <field>
                             <name>CRNGT_EXISTS</name>
-                            <description>* 1&#39;b1 - Exists. *1&#39;b0 - Does not exist</description>
+                            <description>* 1 - Exists. * 0 - Does not exist</description>
                             <bitRange>[1:1]</bitRange>
                             <access>read-only</access>
                         </field>
                         <field>
                             <name>EHR_WIDTH_192</name>
-                            <description>* 1&#39;b1 - 192-bit EHR. *1&#39;b0 - 128-bit EHR</description>
+                            <description>* 1 - 192-bit EHR. * 0 - 128-bit EHR</description>
                             <bitRange>[0:0]</bitRange>
                             <access>read-only</access>
                         </field>
@@ -58460,9 +58470,9 @@ SPDX-License-Identifier: BSD-3-Clause
                     <dim>64</dim>
                     <dimIncrement>0x4</dimIncrement>
                     <description
-                        >Software lock register for page n, one word a page (SW_LOCK0..63). Locks are initialised from the OTP lock pages at reset. This register can be
-                        written to further advance the lock state of each page (until next reset), and read to check the current lock state
-                        of a page.</description
+                        >Software lock register for page n, one word a page (SW_LOCK0..63). Locks are initialised from the OTP lock pages at
+                        reset. This register can be written to further advance the lock state of each page (until next reset), and read to
+                        check the current lock state of a page.</description
                     >
                     <resetValue>0x00000000</resetValue>
                     <fields>
@@ -58522,7 +58532,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Execute instruction</description>
                             <bitRange>[30:30]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 13.9 Table 1334) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 13.9 Table 1453) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -58796,7 +58806,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             <description>Clear counter before use</description>
                             <bitRange>[29:29]</bitRange>
                             <access>write-only</access>
-                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 13.9 Table 1346) -->
+                            <!-- Kvasir: self-clearing trigger, a written 0 does nothing (SC; RP2350 datasheet 13.9 Table 1465) -->
                             <modifiedWriteValues>oneToSet</modifiedWriteValues>
                         </field>
                         <field>
@@ -77366,7 +77376,7 @@ SPDX-License-Identifier: BSD-3-Clause
             </interrupt>
         </peripheral>
         <peripheral>
-            <!-- Kvasir: interrupt lines only: PROC0_IRQ_CTI 40, PROC1_IRQ_CTI 41 (RP2350 datasheet Table 95, md l.3780-3781), missing in the vendor SVD -->
+            <!-- Kvasir: interrupt lines only: PROC0_IRQ_CTI 40, PROC1_IRQ_CTI 41 (RP2350 datasheet Table 95, md l.4583-4584), missing in the vendor SVD -->
             <name>PROC_CTI</name>
             <baseAddress>0x00000000</baseAddress>
             <addressBlock>

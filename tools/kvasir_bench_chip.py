@@ -54,8 +54,8 @@ def xip(bench, args) -> None:
     hit_at, acc_at = xbase + xregs["CTR_HIT"][0], xbase + xregs["CTR_ACC"][0]
     tim, rfmt, rcmd = (qbase + qregs[n][0]
                        for n in ("M0_TIMING", "M0_RFMT", "M0_RCMD"))
-    # saturating and write-to-clear (RP2350 datasheet Tables 442/443): full within a minute of
-    # boot, so clear them first. CTR_ACC counts uncached accesses too (Table 443).
+    # saturating and write-to-clear (RP2350 datasheet Tables 452/453): full within a minute of
+    # boot, so clear them first. CTR_ACC counts uncached accesses too (Table 453).
     bench.write([(hit_at, 0), (acc_at, 0)])
     t0, (h0, a0) = bench.read([hit_at, acc_at])
     time.sleep(args.seconds)
@@ -101,7 +101,7 @@ def qmi_arguments(parser) -> None:
 def qmi(bench, args) -> None:
     """A core reset from the probe while the firmware erases or programs its own flash leaves the
     QMI with a memory-mapped transfer that never ends (DIRECT_CSR.BUSY, "set if a memory-mapped
-    transfer is in progress", RP2350 datasheet 12.14 Table 1294): the boot ROM waits for it and the
+    transfer is in progress", RP2350 datasheet 12.14 Table 1403): the boot ROM waits for it and the
     core locks up, every flash download fails. A core reset does not reset the QMI; a watchdog
     reset with PSM.WDSEL covering XIP does. `--recover` writes chip.cmake's `_chip_jlink_stall_recovery`
     words, the ones the printer writes (WATCHDOG SCRATCH4 to 0 first: no CoreResetGuard boot vector

@@ -6,7 +6,7 @@
 // AIRCR.SYSRESETREQ is a warm reset of the requesting core only (RP2350 datasheet 13.9); core 1 and DMA run on and keep
 // reading flash through the QMI while the boot ROM sets it up: their reads can return junk and the ROM can stall.
 //
-// The ROM's watchdog boot vector (5.2.4, Table 451: SCRATCH4..7, entry with the Thumb bit) is called before the ROM
+// The ROM's watchdog boot vector (5.2.4, Table 462: SCRATCH4..7, entry with the Thumb bit) is called before the ROM
 // touches the QMI and may return. The routine here (a RAM function) aborts DMA, puts core 1 back into the ROM's holding
 // pen and returns. The ROM keeps its pre-boot stack in boot RAM (4.3), so main SRAM is as the image left it.
 //
@@ -37,7 +37,7 @@ struct CoreResetGuard {
     // The routine: called by the ROM with the stack pointer from SCRATCH6, returns to it. Registers r0-r3 only (the
     // ROM calls it as a function), every literal in its own pool (.ltorg) in RAM with it. Every address and bit is an
     // operand from the generated registers: RESETS RESET_DONE.DMA (7.5.3), DMA CHAN_ABORT (bits 15:0, high until
-    // in-flight transfers are flushed; 12.6.10 Table 1182), PSM FRCE_OFF.PROC1 (7.4.4 Table 531) through the atomic
+    // in-flight transfers are flushed; 12.6.10 Table 1290), PSM FRCE_OFF.PROC1 (7.4.4 Table 563) through the atomic
     // set / clear aliases (2.1.3, rp_common/RegisterAlias.hpp).
     [[KVASIR_RAM_FUNC_ATTRIBUTES,
       gnu::naked,
